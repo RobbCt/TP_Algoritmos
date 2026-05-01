@@ -1,0 +1,39 @@
+# depslib dependency file v1.0
+1777659335 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\main.c
+	"juego.h"
+
+1777657415 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\config.c
+	"config.h"
+
+1777658087 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\config.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"tipos.h"
+	"constantes.h"
+
+1777657162 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\tipos.h
+
+1777657949 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\constantes.h
+
+1777657973 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\juego.c
+	"juego.h"
+
+1777658132 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\juego.h
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	"tipos.h"
+	"tablero.h"
+	"constantes.h"
+
+1777658391 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\tablero.h
+	<stdio.h>
+	<stdlib.h>
+	"tipos.h"
+	"constantes.h"
+	"config.h"
+
+1777659626 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\tablero.c
+	"tablero.h"
+
