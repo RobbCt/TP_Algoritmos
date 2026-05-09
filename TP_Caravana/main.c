@@ -8,7 +8,7 @@ int main()
     do
     {
         puts("\nCARAVANA DEL DESIERTO");
-        puts("Seleccione una opcion..");
+        puts("Seleccione una opcion...");
         puts("1- Nueva Partida");
         puts("2- Como se juega?");
         puts("3- Rankings");

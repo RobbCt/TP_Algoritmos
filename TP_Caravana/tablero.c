@@ -1,11 +1,12 @@
 #include "tablero.h"
 
 
-int generarTablero( tTablero*tab, char* nArch)
+int generarTablero(tTablero *tab, char *nArch)
 {
     FILE* pf=fopen(nArch, "wt");
     int i=1;
 
+    ///bajamos define's a vector
     char icons[]= {
         ICON_JUGADOR,   //0
         ICON_PUNTO,     //1
@@ -18,11 +19,14 @@ int generarTablero( tTablero*tab, char* nArch)
         ICON_SALIDA     //8
         }; //rand de 1-6
 
+    ///leemos en tab los valores inicales del tablero desde config.txt
     if(!pf || leerConfig(tab, CONFIG_ARCH)!=TODO_OK)
     {
         if(pf) fclose(pf);
         return ERROR_TABLERO;
     }
+
+    ///validamos si es jugable el tablero
     int cantPuntos= tab->cantPos - tab->cantBand - tab->cantOasis - tab->cantPlusV - tab->cantPrem - tab->cantTorm - 2;
     int iconAnt=-1;
 
@@ -33,9 +37,11 @@ int generarTablero( tTablero*tab, char* nArch)
         return ERROR_TABLERO;
     }
 
+    ///de ser jugable 01:[I J]...
     fprintf(pf, "%02d:[%c %c]\n", i, icons[7], icons[0]);//seteamos jugador al inicio-> 01:[I J]
     i++;
 
+    ///...creamos y asignamos q habra en todos los casilleros del tablero
     while(i<tab->cantPos)
     {
         int random= valRandom(tab, cantPuntos, iconAnt);
@@ -55,14 +61,19 @@ int generarTablero( tTablero*tab, char* nArch)
         fprintf(pf, "%02d:%c\n", i, icons[random]);
         i++;
     }
+
+    ///de ser terminado 0n:S
     fprintf(pf, "%02d:%c\n", i, icons[8]);//seteamos salida al final
 
+    ///tablero "caravana.txt" creado
     fclose(pf);
     return TODO_OK;
 }
 
 int valRandom(tTablero* tab, int posiciones, int anterior)
 {
+    ///se itera aleatoraimente hasta elejir hay en cada casillero
+    ///(respetando cantidades y secuencias)
     int random, valido;
 
     do

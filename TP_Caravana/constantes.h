@@ -7,6 +7,7 @@
 #define ERROR_TABLERO    2
 #define ERROR_PARTIDA    3
 #define ERROR_CONFIG     4
+#define SIN_MEMO         5
 
 //tamaños def
 #define TAMLINEA        100

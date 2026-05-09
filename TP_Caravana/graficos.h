@@ -1,0 +1,6 @@
+#ifndef GRAFICOS_H_INCLUDED
+#define GRAFICOS_H_INCLUDED
+
+
+
+#endif // GRAFICOS_H_INCLUDED

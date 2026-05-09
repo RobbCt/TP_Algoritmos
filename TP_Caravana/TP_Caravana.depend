@@ -37,3 +37,66 @@
 1777659626 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\tablero.c
 	"tablero.h"
 
+1778259704 source:c:\users\rober\desktop\tp-algo\tp_caravana\config.c
+	"config.h"
+
+1778259772 c:\users\rober\desktop\tp-algo\tp_caravana\config.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"tipos.h"
+	"constantes.h"
+
+1778259772 c:\users\rober\desktop\tp-algo\tp_caravana\tipos.h
+
+1778286676 c:\users\rober\desktop\tp-algo\tp_caravana\constantes.h
+
+1778346673 source:c:\users\rober\desktop\tp-algo\tp_caravana\juego.c
+	"juego.h"
+	"GRAFICOS/logica.h"
+	"GRAFICOS/render.h"
+	"funciones_listaDinamica.h"
+
+1778330571 c:\users\rober\desktop\tp-algo\tp_caravana\juego.h
+	<stdio.h>
+	<stdlib.h>
+	<time.h>
+	"tipos.h"
+	"tablero.h"
+	"constantes.h"
+
+1778259772 c:\users\rober\desktop\tp-algo\tp_caravana\tablero.h
+	"tipos.h"
+	"constantes.h"
+	"config.h"
+
+1778286554 source:c:\users\rober\desktop\tp-algo\tp_caravana\tablero.c
+	"tablero.h"
+
+1778259706 source:c:\users\rober\desktop\tp-algo\tp_caravana\main.c
+	"juego.h"
+
+1777258939 source:c:\users\rober\desktop\tp-algo\tp_caravana\funciones_listadinamica.c
+	"funciones_listaDinamica.h"
+
+1777258907 c:\users\rober\desktop\tp-algo\tp_caravana\funciones_listadinamica.h
+	<stdlib.h>
+	<string.h>
+
+1778344673 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\render.c
+	"render.h"
+	"logica.h"
+
+1778343099 c:\users\rober\desktop\tp-algo\tp_caravana\graficos\render.h
+	<stdio.h>
+	"../funciones_listaDinamica.h"
+
+1778346008 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.c
+	"../constantes.h"
+	"logica.h"
+	"../funciones_listaDinamica.h"
+
+1778346008 c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.h
+	<stdio.h>
+	"../funciones_listaDinamica.h"
+
