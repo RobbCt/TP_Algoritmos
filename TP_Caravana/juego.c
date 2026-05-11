@@ -11,6 +11,11 @@ int nuevaPartida(const char* nombreJugador)
     tTablero tablero;
 
     ///validar q se haya creado un tablero valido
+//    do
+//    {
+//        generarTablero(&tablero, CARAVANA_ARCH);
+//    }while(!juegoValido(CARAVANA_ARCH ));
+
     if(generarTablero(&tablero, CARAVANA_ARCH)!=TODO_OK)
     {
         puts("No se pudo generar el tablero...");

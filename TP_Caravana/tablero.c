@@ -4,7 +4,7 @@
 int generarTablero(tTablero *tab, char *nArch)
 {
     FILE* pf=fopen(nArch, "wt");
-    int i=1;
+    int totalEventos, casillasJugables;
 
     ///bajamos define's a vector
     char icons[]= {
@@ -27,21 +27,32 @@ int generarTablero(tTablero *tab, char *nArch)
     }
 
     ///validamos si es jugable el tablero
-    int cantPuntos= tab->cantPos - tab->cantBand - tab->cantOasis - tab->cantPlusV - tab->cantPrem - tab->cantTorm - 2;
-    int iconAnt=-1;
+    totalEventos=tab->cantBand +tab->cantPrem +tab->cantPlusV +tab->cantOasis +tab->cantTorm;
+    casillasJugables= tab->cantPos-2;
 
-    if(cantPuntos<0)
+    ///de ser jugable 01:[I J]...
+    fprintf(pf, "%02d:[%c %c]\n", 1, icons[7], icons[0]);//seteamos jugador al inicio-> 01:[I J]
+
+
+    //si los eventos entran uno por casilla, se generan separados y repartidos por zonas..
+    if(totalEventos<=casillasJugables)
+        generarPorZonas(pf,tab,icons);
+    else
+        generarPorPaquetes(pf,tab,icons);
+    //si hay más eventos que casillas, se generan paquetes [BB, VT, BP, etc] - prox validar combos posible¿
+
+    fprintf(pf, "%02d:%c\n", tab->cantPos, icons[8]);//seteamos salida al final
+
+/*
+    if(cantPuntos<0) //juntamos combos al azar
     {
         puts("config.txt no aceptable para el tablero, modifiquelo y reintente...");
         fclose(pf);
         return ERROR_TABLERO;
     }
-
-    ///de ser jugable 01:[I J]...
-    fprintf(pf, "%02d:[%c %c]\n", i, icons[7], icons[0]);//seteamos jugador al inicio-> 01:[I J]
-    i++;
-
+*/
     ///...creamos y asignamos q habra en todos los casilleros del tablero
+    /*
     while(i<tab->cantPos)
     {
         int random= valRandom(tab, cantPuntos, iconAnt);
@@ -64,15 +75,15 @@ int generarTablero(tTablero *tab, char *nArch)
 
     ///de ser terminado 0n:S
     fprintf(pf, "%02d:%c\n", i, icons[8]);//seteamos salida al final
-
+*/
     ///tablero "caravana.txt" creado
     fclose(pf);
     return TODO_OK;
 }
-
+/*
 int valRandom(tTablero* tab, int posiciones, int anterior)
 {
-    ///se itera aleatoraimente hasta elejir hay en cada casillero
+    ///se itera aleatoriamente hasta elegir hay en cada casillero
     ///(respetando cantidades y secuencias)
     int random, valido;
 
@@ -111,4 +122,223 @@ int valRandom(tTablero* tab, int posiciones, int anterior)
     }while(!valido);
 
     return random;
+}
+*/
+
+int generarPorZonas(FILE* pf, tTablero* tab, char icons[])
+{
+    int totalEventos = tab->cantBand +tab->cantPrem +tab->cantPlusV +tab->cantOasis +tab->cantTorm;
+    int casillasJugables = tab->cantPos - 2;
+    int cantZonas, i, pos;
+    int* eventosPorZona;
+
+    //para evitar q la 1ra parte del tablero este llena y la 2da vacia:
+    //calculo de cantZonas, algoritmo q la determina para q cada zona tenga una buena distribucion de eventos
+    //tab mas chico= menos zonas, tab mas grande= mas zonas (max 10 para no fragmentar tanto el tablero)
+    if(casillasJugables <= 0)
+        cantZonas= 0;
+    else if(casillasJugables < 3)
+        cantZonas= casillasJugables;
+    else
+    {
+        cantZonas = casillasJugables/10;
+
+        if(cantZonas<3)
+            cantZonas=3;
+        if(cantZonas>10)
+            cantZonas=10;
+    }
+
+    if(cantZonas <= 0)
+        return ERROR_TABLERO;
+
+    eventosPorZona = malloc(cantZonas * sizeof(int));
+
+    if(!eventosPorZona)
+        return SIN_MEMO;
+
+    ///reparte eventos entre zonas, pa q no se gasten todos al principio
+    for(i = 0; i < cantZonas; i++)
+        eventosPorZona[i] = ((i + 1) * totalEventos) / cantZonas - (i * totalEventos) / cantZonas;
+
+    for(pos = 2; pos < tab->cantPos; pos++)
+    {
+        int zona = obtenerZonaDePos(pos, tab->cantPos, cantZonas);
+
+        int inicioZona, finZona, casillasRestantesZona, evento;
+
+        calcularRangoZona(zona, tab->cantPos, cantZonas, &inicioZona, &finZona);
+
+        ///casillas q quedan por recorrer dentro de esta zona incluyendocla pos actual
+        casillasRestantesZona = finZona - pos + 1;
+
+        //si la zona quedó sin eventos, recien entra puntos
+        if(eventosPorZona[zona] <= 0)
+            fprintf(pf, "%02d:%c\n", pos, icons[CASILLERO_PUNTO]);
+        else
+        {
+            ///probabilidad controlada:
+            //mientras + eventos falten en la zona y - casillas queden, + probable es poner evento
+            if(rand() % casillasRestantesZona < eventosPorZona[zona])
+            {
+                evento = selecEvento(tab);
+
+                if(evento != -1)
+                {
+                    fprintf(pf, "%02d:%c\n", pos, icons[evento]);
+                    eventosPorZona[zona]--;
+                }
+                else
+                    fprintf(pf, "%02d:%c\n", pos, icons[CASILLERO_PUNTO]);
+            }
+            else
+                fprintf(pf, "%02d:%c\n", pos, icons[CASILLERO_PUNTO]);
+        }
+    }
+
+    free(eventosPorZona);
+
+    return TODO_OK;
+}
+
+void generarPorPaquetes(FILE* pf, tTablero* tab, char icons[])
+{
+    int pos;
+
+    for(pos = 2; pos < tab->cantPos; pos++)
+    {
+        int eventosRestantes =tab->cantBand +tab->cantPrem +tab->cantPlusV +tab->cantOasis +tab->cantTorm;
+        int casillasRestantes = tab->cantPos - pos;
+
+        int cantEventosEnCasilla, resto, i;
+
+        if(eventosRestantes <= 0)
+            fprintf(pf, "%02d:%c\n", pos, icons[CASILLERO_PUNTO]);
+        else
+        {
+            //cant min de eventos q se debe poner en esta casilla para q entren todos antes de la salida
+            cantEventosEnCasilla = eventosRestantes / casillasRestantes;
+            resto = eventosRestantes % casillasRestantes;
+
+            //resto de eventos q no entran en la div excta
+            //a veces agrega uno extra para repartir el resto¿
+            if(resto > 0 && rand() % casillasRestantes < resto)
+                cantEventosEnCasilla++;
+
+            fprintf(pf, "%02d:", pos);
+
+            //solo si hay mas de un evento ponemos nuestros corchetes
+            if(cantEventosEnCasilla > 1)
+                fprintf(pf, "[");
+
+            for(i = 0; i < cantEventosEnCasilla; i++)
+            {
+                int evento = selecEvento(tab);
+
+                if(evento != -1)
+                    fprintf(pf, "%c", icons[evento]);
+            }
+
+            if(cantEventosEnCasilla > 1)
+                fprintf(pf, "]");
+
+            fprintf(pf, "\n");
+        }
+    }
+}
+
+
+
+void calcularRangoZona(int zona, int cantPos, int cantZonas, int* inicio, int* fin)
+{
+    //zonas incluyen solo casillas jugables, se setea despues del inicio y antes de salida
+    int primeraJugable =2;
+    int casillasJugables = cantPos-2;
+
+    int tamZona = casillasJugables/cantZonas;
+    int resto = casillasJugables %cantZonas;
+
+    int i;
+
+    *inicio = primeraJugable;
+
+    //se reparte casilla "sobrante" en el caso de q la division no de exacra uwu
+    for(i=0; i<zona; i++)
+    {
+        *inicio +=tamZona;
+
+        if(i<resto)
+            (*inicio)++;
+    }
+
+    int largoZona = tamZona;
+
+    if(zona<resto)
+        largoZona++;
+
+    *fin = *inicio +largoZona-1;
+}
+
+int obtenerZonaDePos(int pos, int cantPos, int cantZonas)
+{
+    int zona, inicio, fin;
+
+    for(zona=0; zona<cantZonas; zona++)
+    {
+        calcularRangoZona(zona, cantPos, cantZonas, &inicio, &fin);
+
+        if(pos>=inicio && pos<=fin)
+            return zona;
+    }
+
+    return cantZonas-1;
+}
+
+//mi nuevo valRandom()¿
+int selecEvento(tTablero* tab)
+{
+    int total = tab->cantBand +tab->cantPrem +tab->cantPlusV +tab->cantOasis +tab->cantTorm;
+    int random;
+
+    if(total <= 0)
+        return -1;
+
+
+    //se toma las cantidades restantes de cada evento
+    //ej, si quedan mas bandidos qpremios, hay mas probabilidad de q salga un bandido¿
+
+    random = rand() % total;
+
+    if(random < tab->cantBand)
+    {
+        tab->cantBand--;
+        return CASILLERO_BANDIDO;
+    }
+
+    random -= tab->cantBand;
+
+    if(random < tab->cantPrem)
+    {
+        tab->cantPrem--;
+        return CASILLERO_PREMIO;
+    }
+
+    random -= tab->cantPrem;
+
+    if(random < tab->cantPlusV)
+    {
+        tab->cantPlusV--;
+        return CASILLERO_VIDA;
+    }
+
+    random -= tab->cantPlusV;
+
+    if(random < tab->cantOasis)
+    {
+        tab->cantOasis--;
+        return CASILLERO_OASIS;
+    }
+
+    tab->cantTorm--;
+    return CASILLERO_TORMENTA;
 }

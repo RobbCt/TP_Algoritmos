@@ -25,6 +25,7 @@ int main()
                 fflush(stdin);
                 gets(nombre);
                 nuevaPartida(nombre);
+                system("pause");
                 break;
             case 2:
                 mostrarReglas();
