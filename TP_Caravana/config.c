@@ -4,6 +4,7 @@
 //// trabajo con archivos .txt
 int leerConfig(tTablero* tab, char* nArch)
 {
+    ///cargar estructura de tablero "tab" desde config.txt
     FILE* pf= fopen(nArch,"rt");
     if(!pf)
     {

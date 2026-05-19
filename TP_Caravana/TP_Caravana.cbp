@@ -31,11 +31,27 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="GRAFICOS/logica.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="GRAFICOS/logica.h" />
+		<Unit filename="GRAFICOS/render.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="GRAFICOS/render.h" />
 		<Unit filename="config.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="config.h" />
 		<Unit filename="constantes.h" />
+		<Unit filename="funciones_ListaCircDoble.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="funciones_ListaCircDoble.h" />
+		<Unit filename="funciones_listaDinamica.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="funciones_listaDinamica.h" />
 		<Unit filename="juego.c">
 			<Option compilerVar="CC" />
 		</Unit>

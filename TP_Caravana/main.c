@@ -8,7 +8,7 @@ int main()
     do
     {
         puts("\nCARAVANA DEL DESIERTO");
-        puts("Seleccione una opcion..");
+        puts("Seleccione una opcion...");
         puts("1- Nueva Partida");
         puts("2- Como se juega?");
         puts("3- Rankings");
@@ -23,8 +23,9 @@ int main()
             case 1:
                 printf("Ingrese su nombre:");
                 fflush(stdin);
-                gets(nombre);
+                fgets(nombre, TAM_NOMBRE, stdin);
                 nuevaPartida(nombre);
+                system("pause");
                 break;
             case 2:
                 mostrarReglas();

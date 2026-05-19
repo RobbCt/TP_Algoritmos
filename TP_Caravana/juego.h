@@ -12,6 +12,7 @@
 
 void mostrarReglas();
 int nuevaPartida(const char* nuevoJugador);
+int iniciarPartida(tTablero *tablero);
 void verRanking();
 
 #endif // JUEGO_H_INCLUDED
