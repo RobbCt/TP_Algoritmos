@@ -3,8 +3,7 @@
 
 #include "GRAFICOS/logica.h"
 #include "GRAFICOS/render.h"
-///cambiar por LCDE
-#include "funciones_listaDinamica.h"
+#include "funciones_ListaCircDoble.h"
 
 int nuevaPartida(const char* nombreJugador)
 {
@@ -34,7 +33,7 @@ int nuevaPartida(const char* nombreJugador)
 
 int iniciarPartida(tTablero *tablero)
 {
-    tLista mapa;
+    tListaCD mapa;
     tJugador *jugador;
 
     ///durante el juego simepre tener puntero a jugador
@@ -42,7 +41,7 @@ int iniciarPartida(tTablero *tablero)
     if(jugador == NULL)
         return SIN_MEMO;
 
-    crearLista(&mapa);
+    crearListaCD(&mapa);
 
     ///cree la lista dinamica y sus nodos tienen toda la info
     cargarMapa(&mapa, jugador, tablero->vidasInicio);
@@ -54,7 +53,7 @@ int iniciarPartida(tTablero *tablero)
         procesarTurno(&mapa, jugador);
     }
 
-    vaciarLista(&mapa);
+    vaciarListaCD(&mapa);
     free(jugador);
     //y free para todos los bandidos secuencialmente
 

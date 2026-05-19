@@ -1,13 +1,11 @@
 #include "../constantes.h"
 #include "logica.h"
 
-///cambiar por LCDE
-#include "../funciones_listaDinamica.h"
 
-int verificar(tLista *m);
+int verificar(tListaCD *m);
 int avance();
 
-int cargarMapa(tLista *mapa, tJugador *jugador, int vidasJugador)
+int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador)
 {
     FILE *pf = fopen(CARAVANA_ARCH, "rt");
     if(!pf)
@@ -32,7 +30,7 @@ int cargarMapa(tLista *mapa, tJugador *jugador, int vidasJugador)
         jugador->vidas = vidasJugador;
         jugador->puntos = 0;
 
-        ponerAlFinal(mapa, &terreno, sizeof(terreno));
+        ponerAlFinalCD(mapa, &terreno, sizeof(terreno));
 
         jugador->posActual = *mapa;
     }
@@ -48,7 +46,6 @@ int cargarMapa(tLista *mapa, tJugador *jugador, int vidasJugador)
         char *iconoReg;
 
         iconoReg = strchr(linea, ':');
-
         if(!iconoReg)
         {
             fclose(pf);
@@ -82,36 +79,36 @@ int cargarMapa(tLista *mapa, tJugador *jugador, int vidasJugador)
             terreno.jugador = NULL;
         }
 
-        ponerAlFinal(mapa, &terreno, sizeof(terreno));
+        ponerAlFinalCD(mapa, &terreno, sizeof(terreno));
 
         ///posicion de bandido (cada uno apunta a su nodo)
         if(terreno.bandido)
         {
-            tNodo *ult = *mapa;
+//            tNodo *ult = *mapa;
+//
+//            while(ult->sig)
+//                ult = ult->sig;
 
-            while(ult->sig)
-                ult = ult->sig;
-
-            bandido->posActual = ult;
+            bandido->posActual = (*mapa)->ant;
         }
     }
 
     ///(quitar) verificos q el txt sea igual a mis nodos
-    //verificar(mapa);
-    //puts("");
-    //system("pause");
+//    verificar(mapa);
+//    puts("");
+//    system("pause");
 
     fclose(pf);
     return TODO_OK; //Y N BANDIDOS PARA UNA CASASILLA?
 }
 
-int verificar(tLista *m)
+int verificar(tListaCD *m)
 {
     tTerreno terreno;
     int i = 0;
 
 
-    while(sacarPrimeroLista(m, &terreno, sizeof(terreno)) == EXITO)
+    while(sacarPrimeroListaCD(m, &terreno, sizeof(terreno)) == EXITO)
     {
         i++;
 
@@ -144,7 +141,7 @@ int verificar(tLista *m)
     return TODO_OK;
 }
 
-void procesarTurno(tLista *mapa, tJugador *jugador)
+void procesarTurno(tListaCD *mapa, tJugador *jugador)
 {
     int i, pasos;
     tNodo *actual;

@@ -44,6 +44,10 @@
 		</Unit>
 		<Unit filename="config.h" />
 		<Unit filename="constantes.h" />
+		<Unit filename="funciones_ListaCircDoble.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="funciones_ListaCircDoble.h" />
 		<Unit filename="funciones_listaDinamica.c">
 			<Option compilerVar="CC" />
 		</Unit>

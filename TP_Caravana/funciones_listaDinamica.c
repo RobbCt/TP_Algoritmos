@@ -26,7 +26,7 @@ void vaciarLista(tLista *p)
 {
     while(*p)
     {
-        tNodo *elim = *p;
+        tNodoL *elim = *p;
         *p = elim->sig;
 
         free(elim->info);
@@ -36,9 +36,9 @@ void vaciarLista(tLista *p)
 
 int ponerAlComienzo(tLista *p,const void *d, unsigned tamBytes)
 {
-     tNodo *nue;
+     tNodoL *nue;
 
-     nue = (tNodo *)malloc(sizeof(tNodo));
+     nue = (tNodoL *)malloc(sizeof(tNodoL));
 
      if(nue == NULL || (nue->info = malloc(tamBytes)) == NULL)
      {
@@ -56,7 +56,7 @@ int ponerAlComienzo(tLista *p,const void *d, unsigned tamBytes)
 
 int sacarPrimeroLista(tLista *p, void *d, unsigned tamBytes)
 {
-    tNodo *sale = *p;
+    tNodoL *sale = *p;
 
     if(*p == NULL)
         return LISTA_VACIA;
@@ -82,9 +82,9 @@ int verPrimeroLista(const tLista *p, void *d, unsigned tamBytes)
 
 int ponerAlFinal(tLista *p, const void *d, unsigned tamBytes)
 {
-    tNodo *nue;
+    tNodoL *nue;
 
-    nue = (tNodo *)malloc(sizeof(tNodo));
+    nue = (tNodoL *)malloc(sizeof(tNodoL));
     if(nue == NULL || (nue->info = malloc(tamBytes)) == NULL)
     {
         free(nue);

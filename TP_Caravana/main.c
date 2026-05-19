@@ -23,7 +23,7 @@ int main()
             case 1:
                 printf("Ingrese su nombre:");
                 fflush(stdin);
-                gets(nombre);
+                fgets(nombre, TAM_NOMBRE, stdin);
                 nuevaPartida(nombre);
                 system("pause");
                 break;

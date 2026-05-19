@@ -83,7 +83,7 @@ int generarTablero(tTablero *tab, char *nArch)
 /*
 int valRandom(tTablero* tab, int posiciones, int anterior)
 {
-    ///se itera aleatoriamente hasta elegir hay en cada casillero
+    ///se itera aleatoriamente hasta elegir q hay en cada casillero
     ///(respetando cantidades y secuencias)
     int random, valido;
 

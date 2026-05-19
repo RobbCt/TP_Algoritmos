@@ -11,14 +11,14 @@
 
 #define MIN(X, Y) ((X) <= (Y) ? (X) : (Y))
 
-typedef struct sNodo
+typedef struct sNodoL
 {
     void *info;
     unsigned tamInfo;
-    struct sNodo *sig;
-}tNodo;
+    struct sNodoL *sig;
+}tNodoL;
 
-typedef tNodo* tLista;
+typedef tNodoL* tLista;
 
 ///PRIMITIVAS
 

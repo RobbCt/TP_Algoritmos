@@ -3,8 +3,7 @@
 
 #include <stdio.h>
 
-///cambiar por LCDE
-#include "../funciones_listaDinamica.h"
+#include "../funciones_ListaCircDoble.h"
 
 typedef struct
 {
@@ -33,8 +32,8 @@ typedef struct
 
 
 
-int cargarMapa(tLista *mapa, tJugador *jugador, int vidasJugador);
-void procesarTurno(tLista *mapa, tJugador *jugador);
+int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador);
+void procesarTurno(tListaCD *mapa, tJugador *jugador);
 
 
 
