@@ -35,6 +35,7 @@ int iniciarPartida(tTablero *tablero)
 {
     tListaCD mapa;
     tJugador *jugador;
+    tCola colaMovimientos;
 
     ///durante el juego simepre tener puntero a jugador
     jugador = malloc(sizeof(tJugador));
@@ -43,6 +44,9 @@ int iniciarPartida(tTablero *tablero)
 
     crearListaCD(&mapa);
 
+    //Acondicionar Cola Movimientos
+    colaCrear(&colaMovimientos);
+
     ///cree la lista dinamica y sus nodos tienen toda la info
     cargarMapa(&mapa, jugador, tablero->vidasInicio);
 
@@ -50,7 +54,7 @@ int iniciarPartida(tTablero *tablero)
     {
         renderizarMapa(&mapa);
 
-        procesarTurno(&mapa, jugador);
+        procesarTurno(&mapa, jugador, &colaMovimientos);
     }
 
     vaciarListaCD(&mapa);
