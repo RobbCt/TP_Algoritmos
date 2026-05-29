@@ -1,5 +1,6 @@
 #include "../constantes.h"
 #include "logica.h"
+#include <ctype.h>
 
 
 int verificar(tListaCD *m);
@@ -141,30 +142,75 @@ int verificar(tListaCD *m)
     return TODO_OK;
 }
 
-void procesarTurno(tListaCD *mapa, tJugador *jugador)
+void procesarTurno(tListaCD *mapa, tJugador *jugador, tCola* colaMovimientos)
 {
-    int i, pasos;
-    tNodo *actual;
+    int numDado = tirarDado();
+    char direccion = 'A';
+    tMovimiento movJugador;
+    printf("En el dado salio el numero: %d\n", numDado);
 
-    pasos = avance();
 
-    actual = jugador->posActual;
 
-    ///sacar jugador de casilla actual
-    ((tTerreno*)actual->info)->jugador = NULL;
+    //Aca se deberia verificar que la posicion del jugador le permita ir atras
+    //if(PosicionJugador <= numDado)
+    puts("Desea Avanzar o retrodecer?(A/R)");
+        do
+            {
+                scanf("%c", &direccion);
+                fflush(stdin);
+            }while(direccion!='A' && direccion!='R');
 
+
+        movJugador.posActual=jugador->posActual;
+        movJugador.direccion=direccion;
+        movJugador.pasos=numDado;
+        colaAgregar(colaMovimientos, &movJugador, sizeof(movJugador));
+
+    //MOVIMIENTO BANDIDOS aca se debe calcular el movimiento de los bandidos y acolar en colaMovimientos
+
+    RealizarMovimiento(jugador, colaMovimientos, mapa);
+
+}
+int tirarDado()
+{
+    int num = rand()%6+1;
+    return num;
+}
+
+int RealizarMovimiento(tJugador* jugador, tCola* colaMovimientos, tListaCD* mapa)
+{
+    int i;
+    tMovimiento movArealizar;
+
+    colaSacar(colaMovimientos, &movArealizar, sizeof(tMovimiento));
+    //sacar jugador de casilla actual
+    ((tTerreno*)jugador->posActual->info)->jugador = NULL;
     i = 0;
-    while(i < pasos && actual->sig != NULL)
+    if(movArealizar.direccion=='A')
     {
-        actual = actual->sig;
-        i++;
+         while(i < movArealizar.pasos && jugador->posActual->sig != NULL)
+        {
+            jugador->posActual= jugador->posActual->sig;
+            i++;
+        }
+    }
+    else
+    {
+          while(i < movArealizar.pasos && jugador->posActual->ant != NULL)
+        {
+            jugador->posActual= jugador->posActual->ant;
+            i++;
+        }
+
     }
 
-    ///poner jugador en nueva casilla
-    ((tTerreno*)actual->info)->jugador = jugador;
 
-    ///actualizar referencia
-    jugador->posActual = actual;
+
+    ///poner jugador en nueva casilla
+    ((tTerreno*)jugador->posActual->info)->jugador = jugador;
+
+    return EXITO;
+
 }
 
 int avance()

@@ -2,7 +2,7 @@
 #define LOGICA_H_INCLUDED
 
 #include <stdio.h>
-
+#include "../tdaCola.h"
 #include "../funciones_ListaCircDoble.h"
 
 typedef struct
@@ -24,6 +24,15 @@ typedef struct
 
 typedef struct
 {
+    tNodo *posActual;
+    unsigned pasos;
+    char direccion;
+    int id;
+
+}tMovimiento;
+
+typedef struct
+{
     char icon;
     int temperatura; //para algoritmo de bandidos (caliente, frio)
     tBandido *bandido;
@@ -33,7 +42,9 @@ typedef struct
 
 
 int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador);
-void procesarTurno(tListaCD *mapa, tJugador *jugador);
+void procesarTurno(tListaCD *mapa, tJugador *jugador, tCola* colaMovimientos);
+int RealizarMovimiento(tJugador* jugador, tCola* colaMovimientos, tListaCD* mapa);
+int tirarDado();
 
 
 
