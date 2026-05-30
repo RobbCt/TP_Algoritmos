@@ -1,9 +1,11 @@
 #include "juego.h"
-
-
 #include "GRAFICOS/logica.h"
 #include "GRAFICOS/render.h"
 #include "funciones_ListaCircDoble.h"
+
+
+int reservarJugador(tJugador** j);
+
 
 int nuevaPartida(const char* nombreJugador)
 {
@@ -15,7 +17,7 @@ int nuevaPartida(const char* nombreJugador)
 //        generarTablero(&tablero, CARAVANA_ARCH);
 //    }while(!juegoValido(CARAVANA_ARCH ));
 
-    if(generarTablero(&tablero, CARAVANA_ARCH)!=TODO_OK)
+    if(generarTablero(&tablero, CARAVANA_ARCH) != TODO_OK)
     {
         puts("No se pudo generar el tablero...");
         return ERROR_PARTIDA;
@@ -33,26 +35,25 @@ int nuevaPartida(const char* nombreJugador)
 
 int iniciarPartida(tTablero *tablero)
 {
+
     tListaCD mapa;
     tJugador *jugador;
     tCola colaMovimientos;
 
     ///durante el juego simepre tener puntero a jugador
-    jugador = malloc(sizeof(tJugador));
-    if(jugador == NULL)
-        return SIN_MEMO;
+    reservarJugador(&jugador);
 
     crearListaCD(&mapa);
 
     //Acondicionar Cola Movimientos
-    colaCrear(&colaMovimientos);
+    crearCola(&colaMovimientos);
 
     ///cree la lista dinamica y sus nodos tienen toda la info
     cargarMapa(&mapa, jugador, tablero->vidasInicio);
 
     while(jugador->vidas != 0)
     {
-        renderizarMapa(&mapa);
+        renderizarPantalla(&mapa, jugador->vidas, jugador->proteccion, jugador->puntos, jugador->turno);
 
         procesarTurno(&mapa, jugador, &colaMovimientos);
     }
@@ -64,7 +65,14 @@ int iniciarPartida(tTablero *tablero)
     return TODO_OK;
 }
 
+int reservarJugador(tJugador** j)
+{
+    *j = malloc(sizeof(tJugador));
+    if (*j == NULL)
+        return SIN_MEMO;
 
+    return EXITO;
+}
 
 
 

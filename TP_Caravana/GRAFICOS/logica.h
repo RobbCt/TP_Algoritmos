@@ -2,21 +2,23 @@
 #define LOGICA_H_INCLUDED
 
 #include <stdio.h>
-#include "../tdaCola.h"
+#include <ctype.h>
+#include "../constantes.h"
+#include "../funciones_colaDinamica.h"
 #include "../funciones_ListaCircDoble.h"
 
 typedef struct
 {
     char icon;
-    int ultimoMov;
+    char ultimoMov;
     tNodo *posActual;
 }tBandido;
 
 typedef struct
 {
     char icon;
-    int proteccion;
-    int turno; //tiene tuno para tirar?
+    char proteccion;
+    char turno; //tiene tuno para tirar?
     int vidas;
     int puntos;
     tNodo *posActual;

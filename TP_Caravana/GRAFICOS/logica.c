@@ -1,10 +1,8 @@
-#include "../constantes.h"
 #include "logica.h"
-#include <ctype.h>
-
 
 int verificar(tListaCD *m);
-int avance();
+char iconoDeLinea(char* linea);
+int reservarBandido(tBandido** b);
 
 int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador)
 {
@@ -16,7 +14,7 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador)
     tTerreno terreno;
     tBandido *bandido;
 
-    ///cragamos el primer casillero a la lista
+    ///cragamos el primer casillero a la listaCD
     fgets(linea, sizeof(linea), pf);
     if(strcmpi(linea,"01:[I J]\n") == 0)
     {
@@ -26,8 +24,8 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador)
         terreno.jugador = jugador;
 
         jugador->icon = ICON_JUGADOR;
-        jugador->proteccion = 0;
-        jugador->turno = 1;
+        jugador->proteccion = 'N';
+        jugador->turno = 'Y';
         jugador->vidas = vidasJugador;
         jugador->puntos = 0;
 
@@ -41,28 +39,15 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador)
         return ERROR_TABLERO;
     }
 
-    ///cargamos los siguientes casilleros a la lista
+    ///cargamos los siguientes casilleros a la listaCD
     while(fgets(linea, sizeof(linea), pf))
     {
-        char *iconoReg;
+        char icon = iconoDeLinea(linea);
 
-        iconoReg = strchr(linea, ':');
-        if(!iconoReg)
+        if(icon == ICON_BANDIDO)
         {
-            fclose(pf);
-            return ERROR_ARCHIVO;
-        }
-
-        iconoReg ++;
-
-        if(*iconoReg == ICON_BANDIDO)
-        {
-            bandido = malloc(sizeof(tBandido));
-            if(bandido == NULL)
-            {
-                fclose(pf);
-                return SIN_MEMO;
-            }
+            //bandidos en terreno
+            reservarBandido(&bandido);
 
             terreno.icon = ICON_PUNTO;
             terreno.temperatura = 0;
@@ -70,11 +55,12 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador)
             terreno.bandido = bandido;
 
             bandido->icon = ICON_BANDIDO;
-            bandido ->ultimoMov = 0;
+            bandido->ultimoMov = '\0';
         }
         else
         {
-            terreno.icon = *iconoReg;
+            //puntos, tormentas, oasis, vidas, salida en terreno
+            terreno.icon = icon;
             terreno.temperatura = 0;
             terreno.bandido = NULL;
             terreno.jugador = NULL;
@@ -84,14 +70,8 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador)
 
         ///posicion de bandido (cada uno apunta a su nodo)
         if(terreno.bandido)
-        {
-//            tNodo *ult = *mapa;
-//
-//            while(ult->sig)
-//                ult = ult->sig;
-
             bandido->posActual = (*mapa)->ant;
-        }
+
     }
 
     ///(quitar) verificos q el txt sea igual a mis nodos
@@ -164,17 +144,12 @@ void procesarTurno(tListaCD *mapa, tJugador *jugador, tCola* colaMovimientos)
         movJugador.posActual=jugador->posActual;
         movJugador.direccion=direccion;
         movJugador.pasos=numDado;
-        colaAgregar(colaMovimientos, &movJugador, sizeof(movJugador));
+        ponerEnCola(colaMovimientos, &movJugador, sizeof(movJugador));
 
     //MOVIMIENTO BANDIDOS aca se debe calcular el movimiento de los bandidos y acolar en colaMovimientos
 
     RealizarMovimiento(jugador, colaMovimientos, mapa);
 
-}
-int tirarDado()
-{
-    int num = rand()%6+1;
-    return num;
 }
 
 int RealizarMovimiento(tJugador* jugador, tCola* colaMovimientos, tListaCD* mapa)
@@ -182,7 +157,7 @@ int RealizarMovimiento(tJugador* jugador, tCola* colaMovimientos, tListaCD* mapa
     int i;
     tMovimiento movArealizar;
 
-    colaSacar(colaMovimientos, &movArealizar, sizeof(tMovimiento));
+    sacarDeCola(colaMovimientos, &movArealizar, sizeof(tMovimiento));
     //sacar jugador de casilla actual
     ((tTerreno*)jugador->posActual->info)->jugador = NULL;
     i = 0;
@@ -213,16 +188,35 @@ int RealizarMovimiento(tJugador* jugador, tCola* colaMovimientos, tListaCD* mapa
 
 }
 
-int avance()
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int tirarDado()
 {
-    int pasos;
-
-    printf("\nIngresa movimiento [1-6]: ");
-    scanf("%d", &pasos);
-
-    while(pasos < 1 || pasos > 6)
-        scanf("%d", &pasos);
-
-    return pasos;
+    int num = rand()%6+1;
+    return num;
 }
+
+char iconoDeLinea(char* linea)
+{
+    //devuelvo el char luego de ':' en caravana txt
+    char *reg;
+
+    reg = strchr(linea, ':');
+
+    if(reg == NULL)
+        return ERROR_ARCHIVO;
+
+    return *(reg+1);
+}
+
+int reservarBandido(tBandido** b)
+{
+    *b = malloc(sizeof(tBandido));
+    if (*b == NULL)
+        return SIN_MEMO;
+
+    return EXITO;
+}
+
+
 

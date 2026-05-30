@@ -48,6 +48,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="funciones_ListaCircDoble.h" />
+		<Unit filename="funciones_colaDinamica.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="funciones_colaDinamica.h" />
 		<Unit filename="funciones_listaDinamica.c">
 			<Option compilerVar="CC" />
 		</Unit>
