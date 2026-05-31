@@ -42,4 +42,5 @@ int sacarUltimoLista(tLista *p, void *d, unsigned tamBytes);
 
 int verUltimoLista(const tLista *p, void *d, unsigned tamBytes);
 
+
 #endif // FUNCIONES_LISTADINAMICA_H_INCLUDED

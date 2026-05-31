@@ -23,9 +23,9 @@ void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, cha
         tTerreno *terreno = (tTerreno*) act->info;
 
         if(terreno->jugador)
-            fila[numCol] = terreno->jugador->icon;
-        else if(terreno->bandido)
-            fila[numCol] = terreno->bandido->icon;
+            fila[numCol] = ICON_JUGADOR;
+        else if(terreno->bandidos)
+            fila[numCol] = ICON_BANDIDO;
         else
             fila[numCol] = terreno->icon;
 

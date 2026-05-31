@@ -4,7 +4,7 @@ int verificar(tListaCD *m);
 char iconoDeLinea(char* linea);
 int reservarBandido(tBandido** b);
 
-int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador)
+int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlobales)
 {
     FILE *pf = fopen(CARAVANA_ARCH, "rt");
     if(!pf)
@@ -12,7 +12,6 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador)
 
     char linea[TAMLINEA];
     tTerreno terreno;
-    tBandido *bandido;
 
     ///cragamos el primer casillero a la listaCD
     fgets(linea, sizeof(linea), pf);
@@ -20,8 +19,8 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador)
     {
         terreno.icon = ICON_INICIO;
         terreno.temperatura = 0;
-        terreno.bandido = NULL;
-        terreno.jugador = jugador;
+        terreno.bandidos = 0;
+        terreno.jugador = 1;
 
         jugador->icon = ICON_JUGADOR;
         jugador->proteccion = 'N';
@@ -42,84 +41,51 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador)
     ///cargamos los siguientes casilleros a la listaCD
     while(fgets(linea, sizeof(linea), pf))
     {
+        tBandido bandido;
         char icon = iconoDeLinea(linea);
 
         if(icon == ICON_BANDIDO)
         {
             //bandidos en terreno
-            reservarBandido(&bandido);
 
             terreno.icon = ICON_PUNTO;
             terreno.temperatura = 0;
-            terreno.jugador = NULL;
-            terreno.bandido = bandido;
+            terreno.jugador = 0;
+            terreno.bandidos = 1;
 
-            bandido->icon = ICON_BANDIDO;
-            bandido->ultimoMov = '\0';
+            bandido.icon = ICON_BANDIDO;
+            bandido.ultimoMov = '\0';
         }
         else
         {
             //puntos, tormentas, oasis, vidas, salida en terreno
             terreno.icon = icon;
             terreno.temperatura = 0;
-            terreno.bandido = NULL;
-            terreno.jugador = NULL;
+            terreno.bandidos = 0;
+            terreno.jugador = 0;
         }
 
+        ///terreno cargado
         ponerAlFinalCD(mapa, &terreno, sizeof(terreno));
 
         ///posicion de bandido (cada uno apunta a su nodo)
-        if(terreno.bandido)
-            bandido->posActual = (*mapa)->ant;
+        if(terreno.bandidos)
+        {
+            //anterior al primer nodo = ultimo nodo agregado
+            bandido.posActual = (*mapa)->ant;
+            //bandido cargado, lo enlistamos en bandidos Gloables
+            ponerAlFinal(bGlobales, &bandido, sizeof(bandido));
+        }
 
     }
 
     ///(quitar) verificos q el txt sea igual a mis nodos
 //    verificar(mapa);
-//    puts("");
+    puts("");
 //    system("pause");
 
     fclose(pf);
     return TODO_OK; //Y N BANDIDOS PARA UNA CASASILLA?
-}
-
-int verificar(tListaCD *m)
-{
-    tTerreno terreno;
-    int i = 0;
-
-
-    while(sacarPrimeroListaCD(m, &terreno, sizeof(terreno)) == EXITO)
-    {
-        i++;
-
-        printf("\n[%d] icon: %c | temp: %d",
-               i,
-               terreno.icon,
-               terreno.temperatura);
-
-        if(terreno.bandido)
-        {
-            printf("  BANDIDO -> icon: %c | ultMov: %d\n",
-                   terreno.bandido->icon,
-                   terreno.bandido->ultimoMov);
-        }
-
-        if(terreno.jugador)
-        {
-            printf("  JUGADOR -> icon: %c | vidas: %d | prot: %d | turno: %d | puntos: %d\n",
-                   terreno.jugador->icon,
-                   terreno.jugador->vidas,
-                   terreno.jugador->proteccion,
-                   terreno.jugador->turno,
-                   terreno.jugador->puntos);
-        }
-    }
-
-    puts("");
-    system("pause");
-
-    return TODO_OK;
 }
 
 void procesarTurno(tListaCD *mapa, tJugador *jugador, tCola* colaMovimientos)
@@ -128,7 +94,6 @@ void procesarTurno(tListaCD *mapa, tJugador *jugador, tCola* colaMovimientos)
     char direccion = 'A';
     tMovimiento movJugador;
     printf("En el dado salio el numero: %d\n", numDado);
-
 
 
     //Aca se deberia verificar que la posicion del jugador le permita ir atras
@@ -141,51 +106,41 @@ void procesarTurno(tListaCD *mapa, tJugador *jugador, tCola* colaMovimientos)
             }while(direccion!='A' && direccion!='R');
 
 
-        movJugador.posActual=jugador->posActual;
-        movJugador.direccion=direccion;
-        movJugador.pasos=numDado;
+        movJugador.posActual = jugador->posActual;
+        movJugador.direccion = direccion;
+        movJugador.pasos = numDado;
         ponerEnCola(colaMovimientos, &movJugador, sizeof(movJugador));
 
     //MOVIMIENTO BANDIDOS aca se debe calcular el movimiento de los bandidos y acolar en colaMovimientos
 
     RealizarMovimiento(jugador, colaMovimientos, mapa);
-
 }
 
 int RealizarMovimiento(tJugador* jugador, tCola* colaMovimientos, tListaCD* mapa)
 {
-    int i;
     tMovimiento movArealizar;
+    tTerreno *terrenoDeJugador;
+    int i;
 
     sacarDeCola(colaMovimientos, &movArealizar, sizeof(tMovimiento));
-    //sacar jugador de casilla actual
-    ((tTerreno*)jugador->posActual->info)->jugador = NULL;
-    i = 0;
-    if(movArealizar.direccion=='A')
+
+    ///sacar jugador de casilla actual
+    terrenoDeJugador = (tTerreno*)jugador->posActual->info;
+    terrenoDeJugador->jugador = 0;
+
+    for(i = 0; i < movArealizar.pasos; i++)
     {
-         while(i < movArealizar.pasos && jugador->posActual->sig != NULL)
-        {
+        if(movArealizar.direccion == 'A')
             jugador->posActual= jugador->posActual->sig;
-            i++;
-        }
-    }
-    else
-    {
-          while(i < movArealizar.pasos && jugador->posActual->ant != NULL)
-        {
+        else
             jugador->posActual= jugador->posActual->ant;
-            i++;
-        }
-
     }
 
-
-
-    ///poner jugador en nueva casilla
-    ((tTerreno*)jugador->posActual->info)->jugador = jugador;
+    ///poner jugador en casilla destino
+    terrenoDeJugador = (tTerreno*)jugador->posActual->info;
+    terrenoDeJugador->jugador = 1;
 
     return EXITO;
-
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -218,5 +173,32 @@ int reservarBandido(tBandido** b)
     return EXITO;
 }
 
+int verificar(tListaCD *m)
+{
+    tTerreno terreno;
+    int i = 0;
 
+
+    while(sacarPrimeroListaCD(m, &terreno, sizeof(terreno)) == EXITO)
+    {
+        i++;
+
+        printf("\n[%d] icon: %c | temp: %d",
+               i,
+               terreno.icon,
+               terreno.temperatura);
+
+        if(terreno.bandidos)
+            printf("BANDIDO -> cant: %d\n", terreno.bandidos);
+
+        if(terreno.jugador)
+            printf("JUGADOR \n");
+
+    }
+
+    puts("");
+    system("pause");
+
+    return TODO_OK;
+}
 

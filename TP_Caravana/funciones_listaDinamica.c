@@ -141,4 +141,3 @@ int verUltimoLista(const tLista *p, void *d, unsigned tamBytes)
 
 
 
-

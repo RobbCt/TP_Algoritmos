@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include "../funciones_ListaCircDoble.h"
+#include "../constantes.h"
 
 void renderizarPantalla(tListaCD *mapa, int vidas, char proteccion, int puntos, char turno);
 void imprimirBorde(int cant);

@@ -6,6 +6,7 @@
 #include "../constantes.h"
 #include "../funciones_colaDinamica.h"
 #include "../funciones_ListaCircDoble.h"
+#include "../funciones_listaDinamica.h"
 
 typedef struct
 {
@@ -19,7 +20,7 @@ typedef struct
     char icon;
     char proteccion;
     char turno; //tiene tuno para tirar?
-    int vidas;
+    unsigned vidas;
     int puntos;
     tNodo *posActual;
 }tJugador;
@@ -30,20 +31,19 @@ typedef struct
     unsigned pasos;
     char direccion;
     int id;
-
 }tMovimiento;
 
 typedef struct
 {
     char icon;
     int temperatura; //para algoritmo de bandidos (caliente, frio)
-    tBandido *bandido;
-    tJugador *jugador;
+    unsigned bandidos;
+    unsigned jugador;
 }tTerreno;
 
 
 
-int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador);
+int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlobales);
 void procesarTurno(tListaCD *mapa, tJugador *jugador, tCola* colaMovimientos);
 int RealizarMovimiento(tJugador* jugador, tCola* colaMovimientos, tListaCD* mapa);
 int tirarDado();

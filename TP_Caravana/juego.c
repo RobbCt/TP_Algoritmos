@@ -2,6 +2,7 @@
 #include "GRAFICOS/logica.h"
 #include "GRAFICOS/render.h"
 #include "funciones_ListaCircDoble.h"
+#include "funciones_listaDinamica.h"
 
 
 int reservarJugador(tJugador** j);
@@ -35,21 +36,24 @@ int nuevaPartida(const char* nombreJugador)
 
 int iniciarPartida(tTablero *tablero)
 {
-
-    tListaCD mapa;
     tJugador *jugador;
+    tListaCD mapa;
     tCola colaMovimientos;
+    tLista bandidosGlobales;
+
 
     ///durante el juego simepre tener puntero a jugador
     reservarJugador(&jugador);
 
     crearListaCD(&mapa);
 
+    crearLista(&bandidosGlobales);
+
     //Acondicionar Cola Movimientos
     crearCola(&colaMovimientos);
 
-    ///cree la lista dinamica y sus nodos tienen toda la info
-    cargarMapa(&mapa, jugador, tablero->vidasInicio);
+    ///cargo la listaCD y todos los bandidos
+    cargarMapa(&mapa, jugador, tablero->vidasInicio, &bandidosGlobales);
 
     while(jugador->vidas != 0)
     {
@@ -59,6 +63,8 @@ int iniciarPartida(tTablero *tablero)
     }
 
     vaciarListaCD(&mapa);
+    vaciarLista(&bandidosGlobales);
+    vaciarCola(&colaMovimientos);
     free(jugador);
     //y free para todos los bandidos secuencialmente
 
