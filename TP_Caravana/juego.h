@@ -8,11 +8,11 @@
 #include "tipos.h"
 #include "tablero.h"
 #include "constantes.h"
-
+#include "ranking.h"
 
 void mostrarReglas();
 int nuevaPartida(const char* nuevoJugador);
 int iniciarPartida(tTablero *tablero);
-void verRanking();
+//void verRanking();
 
 #endif // JUEGO_H_INCLUDED

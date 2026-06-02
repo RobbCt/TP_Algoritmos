@@ -71,8 +71,3 @@ void mostrarReglas()
 //prox
 }
 
-void verRanking()
-{
-//prox
-}
-

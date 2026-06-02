@@ -59,6 +59,10 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="ranking.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="ranking.h" />
 		<Unit filename="tablero.c">
 			<Option compilerVar="CC" />
 		</Unit>
