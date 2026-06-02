@@ -27,16 +27,16 @@ typedef struct
 
 typedef struct
 {
-    tNodo *posActual;
+    tNodo *destino;
     unsigned pasos;
     char direccion;
-    int id;
 }tMovimiento;
 
 typedef struct
 {
     char icon;
-    int temperatura; //para algoritmo de bandidos (caliente, frio)
+    //int tempTemporal; //para algoritmo de bandidos (caliente, frio)
+    unsigned TurnoActualizado;
     unsigned bandidos;
     unsigned jugador;
 }tTerreno;
@@ -44,11 +44,13 @@ typedef struct
 
 
 int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlobales);
-void procesarTurno(tListaCD *mapa, tJugador *jugador, tCola* colaMovimientos);
-int RealizarMovimiento(tJugador* jugador, tCola* colaMovimientos, tListaCD* mapa);
-int tirarDado();
 
+void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigned turno);
 
+void IABandidos(tMovimiento *mov, tBandido *bandido, unsigned turnoAc);
 
+int calcularTemperaturaMov(tBandido *bandido, tNodo *destino, char direccion, unsigned turnoAc);
+
+int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, tListaCD* mapa, unsigned turno);
 
 #endif // LOGICA_H_INCLUDED

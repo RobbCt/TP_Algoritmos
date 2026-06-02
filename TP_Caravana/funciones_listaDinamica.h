@@ -20,6 +20,12 @@ typedef struct sNodoL
 
 typedef tNodoL* tLista;
 
+typedef struct
+{
+    tNodoL *actual;
+    unsigned posicion;
+} tIteradorLista; //onda topicos
+
 ///PRIMITIVAS
 
 void crearLista(tLista *p);
@@ -42,5 +48,8 @@ int sacarUltimoLista(tLista *p, void *d, unsigned tamBytes);
 
 int verUltimoLista(const tLista *p, void *d, unsigned tamBytes);
 
+void* obtenerPrimeroInfo(tLista *p, tIteradorLista *it);
+
+void* obtenerSiguienteInfo(tIteradorLista *it);
 
 #endif // FUNCIONES_LISTADINAMICA_H_INCLUDED

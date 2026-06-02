@@ -138,6 +138,26 @@ int verUltimoLista(const tLista *p, void *d, unsigned tamBytes)
     return EXITO;
 }
 
+void* obtenerPrimeroInfo(tLista *p, tIteradorLista *it)
+{
+    if(*p == NULL)
+        return NULL;
 
+    it->actual = *p;
+    it->posicion = 0;
+
+    return it->actual->info;
+}
+
+void* obtenerSiguienteInfo(tIteradorLista *it)
+{
+    if(it->actual == NULL || it->actual->sig == NULL)
+        return NULL;
+
+    it->actual = it->actual->sig;
+    it->posicion++;
+
+    return it->actual->info;
+}
 
 

@@ -5,9 +5,6 @@
 #include "funciones_listaDinamica.h"
 
 
-int reservarJugador(tJugador** j);
-
-
 int nuevaPartida(const char* nombreJugador)
 {
     tTablero tablero;
@@ -36,53 +33,34 @@ int nuevaPartida(const char* nombreJugador)
 
 int iniciarPartida(tTablero *tablero)
 {
-    tJugador *jugador;
-    tListaCD mapa;
-    tCola colaMovimientos;
-    tLista bandidosGlobales;
-
-
     ///durante el juego simepre tener puntero a jugador
-    reservarJugador(&jugador);
+    tJugador jugador;
+    tListaCD mapa;
+    tLista bandidosGlobales;
+    unsigned turno = 0;
 
     crearListaCD(&mapa);
 
     crearLista(&bandidosGlobales);
 
-    //Acondicionar Cola Movimientos
-    crearCola(&colaMovimientos);
-
     ///cargo la listaCD y todos los bandidos
-    cargarMapa(&mapa, jugador, tablero->vidasInicio, &bandidosGlobales);
+    cargarMapa(&mapa, &jugador, tablero->vidasInicio, &bandidosGlobales);
 
-    while(jugador->vidas != 0)
+    while(jugador.vidas != 0)
     {
-        renderizarPantalla(&mapa, jugador->vidas, jugador->proteccion, jugador->puntos, jugador->turno);
+        renderizarPantalla(&mapa, jugador.vidas, jugador.proteccion, jugador.puntos, jugador.turno, turno);
 
-        procesarTurno(&mapa, jugador, &colaMovimientos);
+        procesarTurno(&mapa, &jugador, &bandidosGlobales, turno);
+
+        turno++;
     }
 
     vaciarListaCD(&mapa);
     vaciarLista(&bandidosGlobales);
-    vaciarCola(&colaMovimientos);
-    free(jugador);
     //y free para todos los bandidos secuencialmente
 
     return TODO_OK;
 }
-
-int reservarJugador(tJugador** j)
-{
-    *j = malloc(sizeof(tJugador));
-    if (*j == NULL)
-        return SIN_MEMO;
-
-    return EXITO;
-}
-
-
-
-
 
 void mostrarReglas()
 {

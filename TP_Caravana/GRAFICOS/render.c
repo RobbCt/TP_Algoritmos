@@ -2,32 +2,44 @@
 #include "logica.h"
 
 #define COLUMNAS_MAPA 15
-#define ANCHO_CASILLA 10
+#define ANCHO_CASILLA 9
 #define ALTO_CASILLA 5
 
-void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, char turno)
+void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, char turno, unsigned nTurno)
 {
     tNodo *act, *inicio;
-    char fila[COLUMNAS_MAPA];
+    char fila[COLUMNAS_MAPA][16];
     int numCol = 0, numFila = 0;
+
     system("cls");
 
     act = inicio = *m;
 
-    ///panel superior
-    printf("VIDAS: %d | PROT: %c | PUNTOS: %d | TURNO: %c\n\n",
-           vidas, proteccion, puntos, turno);
+    printf("VIDAS: %d | PROT: %c | PUNTOS: %d | TURNO: %c | NUMERO DE TURNO: %u\n\n",
+           vidas, proteccion, puntos, turno, nTurno);
 
     do
     {
-        tTerreno *terreno = (tTerreno*) act->info;
+        tTerreno *terreno = (tTerreno*)act->info;
 
         if(terreno->jugador)
-            fila[numCol] = ICON_JUGADOR;
-        else if(terreno->bandidos)
-            fila[numCol] = ICON_BANDIDO;
+            sprintf(fila[numCol], "%c", ICON_JUGADOR);
+        else if(terreno->bandidos > 1)
+        {
+            sprintf(fila[numCol], "Bx%u", terreno->bandidos);
+
+            //bandidosImpresos++;
+            //bandidosExistentes += terreno->bandidos;
+        }
+        else if(terreno->bandidos == 1)
+        {
+            sprintf(fila[numCol], "%c", ICON_BANDIDO);
+
+            //bandidosImpresos++;
+            //bandidosExistentes++;
+        }
         else
-            fila[numCol] = terreno->icon;
+            sprintf(fila[numCol], "%c", terreno->icon);
 
         numCol++;
 
@@ -46,20 +58,30 @@ void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, cha
                     if(numFila % 2 == 0)
                     {
                         for(i = 0; i < COLUMNAS_MAPA; i++)
-                            printf("|%*c%*s",
-                                   ANCHO_CASILLA / 2 + 1,
-                                   fila[i],
-                                   ANCHO_CASILLA - (ANCHO_CASILLA / 2 + 1),
-                                   "");
+                        {
+                            int len = strlen(fila[i]);
+                            int izq = (ANCHO_CASILLA - len) / 2;
+                            int der = ANCHO_CASILLA - len - izq;
+
+                            printf("|");
+                            printf("%*s", izq, "");
+                            printf("%s", fila[i]);
+                            printf("%*s", der, "");
+                        }
                     }
                     else
                     {
                         for(i = COLUMNAS_MAPA - 1; i >= 0; i--)
-                            printf("|%*c%*s",
-                                   ANCHO_CASILLA / 2 + 1,
-                                   fila[i],
-                                   ANCHO_CASILLA - (ANCHO_CASILLA / 2 + 1),
-                                   "");
+                        {
+                            int len = strlen(fila[i]);
+                            int izq = (ANCHO_CASILLA - len) / 2;
+                            int der = ANCHO_CASILLA - len - izq;
+
+                            printf("|");
+                            printf("%*s", izq, "");
+                            printf("%s", fila[i]);
+                            printf("%*s", der, "");
+                        }
                     }
                 }
                 else
@@ -85,8 +107,6 @@ void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, cha
     {
         int i, j;
 
-        fila[numCol] = '\0';
-
         imprimirBorde(numCol);
 
         for(j = 0; j < ALTO_CASILLA; j++)
@@ -98,20 +118,30 @@ void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, cha
                 if(numFila % 2 == 0)
                 {
                     for(i = 0; i < numCol; i++)
-                        printf("|%*c%*s",
-                               ANCHO_CASILLA / 2 + 1,
-                               fila[i],
-                               ANCHO_CASILLA - (ANCHO_CASILLA / 2 + 1),
-                               "");
+                    {
+                        int len = strlen(fila[i]);
+                        int izq = (ANCHO_CASILLA - len) / 2;
+                        int der = ANCHO_CASILLA - len - izq;
+
+                        printf("|");
+                        printf("%*s", izq, "");
+                        printf("%s", fila[i]);
+                        printf("%*s", der, "");
+                    }
                 }
                 else
                 {
                     for(i = numCol - 1; i >= 0; i--)
-                        printf("|%*c%*s",
-                               ANCHO_CASILLA / 2 + 1,
-                               fila[i],
-                               ANCHO_CASILLA - (ANCHO_CASILLA / 2 + 1),
-                               "");
+                    {
+                        int len = strlen(fila[i]);
+                        int izq = (ANCHO_CASILLA - len) / 2;
+                        int der = ANCHO_CASILLA - len - izq;
+
+                        printf("|");
+                        printf("%*s", izq, "");
+                        printf("%s", fila[i]);
+                        printf("%*s", der, "");
+                    }
                 }
             }
             else
@@ -125,6 +155,7 @@ void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, cha
 
         imprimirBorde(numCol);
     }
+
 }
 
 void imprimirBorde(int cantCasillas)

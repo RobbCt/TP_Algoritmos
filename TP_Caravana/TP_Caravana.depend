@@ -51,7 +51,7 @@
 
 1779157848 c:\users\rober\desktop\tp-algo\tp_caravana\constantes.h
 
-1780199673 source:c:\users\rober\desktop\tp-algo\tp_caravana\juego.c
+1780369967 source:c:\users\rober\desktop\tp-algo\tp_caravana\juego.c
 	"juego.h"
 	"GRAFICOS/logica.h"
 	"GRAFICOS/render.h"
@@ -77,26 +77,27 @@
 1779157848 source:c:\users\rober\desktop\tp-algo\tp_caravana\main.c
 	"juego.h"
 
-1780195524 source:c:\users\rober\desktop\tp-algo\tp_caravana\funciones_listadinamica.c
+1780364878 source:c:\users\rober\desktop\tp-algo\tp_caravana\funciones_listadinamica.c
 	"funciones_listaDinamica.h"
 
-1780195526 c:\users\rober\desktop\tp-algo\tp_caravana\funciones_listadinamica.h
+1780210406 c:\users\rober\desktop\tp-algo\tp_caravana\funciones_listadinamica.h
 	<stdlib.h>
 	<string.h>
 
-1780200267 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\render.c
+1780371868 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\render.c
 	"render.h"
 	"logica.h"
 
-1780196594 c:\users\rober\desktop\tp-algo\tp_caravana\graficos\render.h
+1780367736 c:\users\rober\desktop\tp-algo\tp_caravana\graficos\render.h
 	<stdio.h>
+	<string.h>
 	"../funciones_ListaCircDoble.h"
 	"../constantes.h"
 
-1780200361 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.c
+1780371853 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.c
 	"logica.h"
 
-1780200267 c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.h
+1780367311 c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.h
 	<stdio.h>
 	<ctype.h>
 	"../constantes.h"
