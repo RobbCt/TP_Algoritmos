@@ -119,17 +119,27 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlo
     return TODO_OK;
 }
 
-void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigned turno)
+void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigned turno) //considerando hacerlo int y usar macros para diferentes panoramas
 {
+
     tMovimiento mov;
     tCola colaMovimientos;
     tIteradorLista it;
     tBandido *bandido;
 
-    crearCola(&colaMovimientos);
+    crearCola( &colaMovimientos);
+    if(jugador->turno=='Y')
+    {
+        cargarMovJugador(&mov, jugador);
+        ponerEnCola(&colaMovimientos, &mov, sizeof(mov));
+    }
+    else
+    {
+        puts("Turno perdido por tormenta");
+        //SLEEP
 
-    cargarMovJugador(&mov, jugador);
-    ponerEnCola(&colaMovimientos, &mov, sizeof(mov));
+    }
+
 
     //MOVIMIENTO BANDIDOS aca se debe calcular el movimiento de los bandidos y acolar en colaMovimientos
 
@@ -285,19 +295,46 @@ int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, 
     tIteradorLista it;
     tMovimiento movArealizar;
     tBandido *bandidoN;
-
     sacarDeCola(colaMovimientos, &movArealizar, sizeof(tMovimiento));
+    if(j->turno=='Y')
+    {
+        ///sacar jugador de casilla actual
+        terreno = (tTerreno*)j->posActual->info;
+        terreno->jugador = 0;
 
-    ///sacar jugador de casilla actual
-    terreno = (tTerreno*)j->posActual->info;
-    terreno->jugador = 0;
 
+        ///poner a jugador en casilla destino
+        j->posActual = movArealizar.destino;
+        terreno = (tTerreno*)j->posActual->info;
+        terreno->jugador = 1;
+    }
+    else
+    {
+        j->turno='Y';
+    }
 
-    ///poner a jugador en casilla destino
-    j->posActual = movArealizar.destino;
-    terreno = (tTerreno*)j->posActual->info;
-    terreno->jugador = 1;
+    if(terreno->icon=='T') //recomendacion: poner un mensaje que indique la colision producida
+    {
+        j->turno='N';
+        terreno->icon='.';
+    }
+     if(terreno->icon=='O')
+    {
+        j->proteccion='Y';
+        terreno->icon='.';
+    }
 
+     if(terreno->icon=='P')
+    {
+        j->puntos++; //ajustar dependiendo de como funcione el sistema de puntos
+        terreno->icon='.';
+    }
+
+     if(terreno->icon=='V')
+    {
+        j->vidas++;
+        terreno->icon='.';
+    }
 
     bandidoN = (tBandido*)obtenerPrimeroInfo(bGlobales, &it);
     while(bandidoN != NULL)
@@ -315,8 +352,22 @@ int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, 
         terreno->TurnoActualizado = turno;
 
         bandidoN->ultimoMov = movArealizar.direccion;
+        if(bandidoN->posActual == j->posActual && j->proteccion== 'N')
+        {
+            j->vidas--;
+            //terreno->bandidos -= 1;
+            //sacarbandido de la lista
+            //sacarListaClave(bGlobales, bandidoN, sizeof(bandidoN))
+
+        }
+        else if (bandidoN->posActual==j->posActual && j->proteccion=='Y')
+        {
+            j->proteccion='N';
+            //IMPRIMIR QUE EL JUGADOR NO PERDIO VIDA POR PROTECCION
+        }
         bandidoN = (tBandido*)obtenerSiguienteInfo(&it);
     }
+
 
     ///aca abria q evaluar colisiones de jugador-bandido
     ///jugador-oasis, jugadoir-vida extra...
@@ -376,34 +427,38 @@ int verificar(tListaCD *m)
 
 void cargarMovJugador(tMovimiento *mov, tJugador *jugador)
 {
-    tNodo *posDestino = jugador->posActual;
-    unsigned numDado = tirarDado();
-    char direccion = 'A';
-
-    printf("En el dado salio el numero: %d\n", numDado);
-
-    //Aca se deberia verificar que la posicion del jugador le permita ir atras
-    //if(PosicionJugador <= numDado)
-    puts("Desea Avanzar o retrodecer?(A/R)");
-
-    do
+    if(jugador->turno=='Y')
     {
-        scanf(" %c", &direccion);
-        fflush(stdin);
-    }while(direccion != 'A' && direccion != 'R');
+       tNodo *posDestino = jugador->posActual;
+        unsigned numDado = tirarDado();
+        char direccion = 'A';
 
-    for(int i = 0; i < numDado; i++)
-    {
+        printf("En el dado salio el numero: %d\n", numDado);
+
+        //Aca se deberia verificar que la posicion del jugador le permita ir atras
+        //if(PosicionJugador <= numDado)
+        puts("Desea Avanzar o retrodecer?(A/R)");
+
+        do
+        {
+            scanf(" %c", &direccion);
+            fflush(stdin);
+        }while(direccion != 'A' && direccion != 'R');
+
+        for(int i = 0; i < numDado; i++)
+        {
         if(direccion == 'A')
             posDestino = posDestino->sig;
         else
             posDestino = posDestino->ant;
+        }
+
+        //guardamos la posicion destino
+        mov->destino = posDestino;
+        mov->pasos = numDado;
+        mov->direccion = direccion;
     }
 
-    //guardamos la posicion destino
-    mov->destino = posDestino;
-    mov->pasos = numDado;
-    mov->direccion = direccion;
 }
 
 void cargarMovBandido(tMovimiento *mov, tBandido *bandido, unsigned turnoAc)
