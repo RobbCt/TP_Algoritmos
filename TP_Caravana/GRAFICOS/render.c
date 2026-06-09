@@ -2,71 +2,96 @@
 #include "logica.h"
 
 #define COLUMNAS_MAPA 15
-#define ANCHO_CASILLA 7
+#define ANCHO_CASILLA 9
+#define ALTO_CASILLA 5
 
-void renderizarMapa(tListaCD *m)
+void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, char turno, unsigned nTurno)
 {
-    tNodo *act = *m;
-    tNodo *inicio = act;
-
-    char fila[COLUMNAS_MAPA];
-
-    int numCol = 0;
-    int numFila = 0;
+    tNodo *act, *inicio;
+    char fila[COLUMNAS_MAPA][16];
+    int numCol = 0, numFila = 0;
 
     system("cls");
 
-    ///panel superior
-    tTerreno *inicioTerreno = (tTerreno*) act->info;
+    act = inicio = *m;
 
-    if(inicioTerreno->jugador)
-    {
-        printf("VIDAS: %d | PROT: %d | PUNTOS: %d | TURNO: %d\n\n",
-               inicioTerreno->jugador->vidas,
-               inicioTerreno->jugador->proteccion,
-               inicioTerreno->jugador->puntos,
-               inicioTerreno->jugador->turno);
-    }
+    printf("VIDAS: %d | PROT: %c | PUNTOS: %d | TURNO: %c | NUMERO DE TURNO: %u\n\n",
+           vidas, proteccion, puntos, turno, nTurno);
 
     do
     {
-        tTerreno *terreno = (tTerreno*) act->info;
+        tTerreno *terreno = (tTerreno*)act->info;
 
         if(terreno->jugador)
-            fila[numCol] = terreno->jugador->icon;
-        else if(terreno->bandido)
-            fila[numCol] = terreno->bandido->icon;
+            sprintf(fila[numCol], "%c", ICON_JUGADOR);
+        else if(terreno->bandidos > 1)
+        {
+            sprintf(fila[numCol], "Bx%u", terreno->bandidos);
+
+            //bandidosImpresos++;
+            //bandidosExistentes += terreno->bandidos;
+        }
+        else if(terreno->bandidos == 1)
+        {
+            sprintf(fila[numCol], "%c", ICON_BANDIDO);
+
+            //bandidosImpresos++;
+            //bandidosExistentes++;
+        }
         else
-            fila[numCol] = terreno->icon;
+            sprintf(fila[numCol], "%c", terreno->icon);
 
         numCol++;
 
         if(numCol == COLUMNAS_MAPA)
         {
-            int i;
+            int i, j;
 
             imprimirBorde(COLUMNAS_MAPA);
 
-            for(i = 0; i < COLUMNAS_MAPA; i++)
-                printf("|       ");
-            printf("|\n");
-
-            if(numFila % 2 == 0)
+            for(j = 0; j < ALTO_CASILLA; j++)
             {
-                for(i = 0; i < COLUMNAS_MAPA; i++)
-                    printf("|   %c   ", fila[i]);
-            }
-            else
-            {
-                for(i = COLUMNAS_MAPA - 1; i >= 0; i--)
-                    printf("|   %c   ", fila[i]);
-            }
+                int filaIcono = ALTO_CASILLA / 2;
 
-            printf("|\n");
+                if(j == filaIcono)
+                {
+                    if(numFila % 2 == 0)
+                    {
+                        for(i = 0; i < COLUMNAS_MAPA; i++)
+                        {
+                            int len = strlen(fila[i]);
+                            int izq = (ANCHO_CASILLA - len) / 2;
+                            int der = ANCHO_CASILLA - len - izq;
 
-            for(i = 0; i < COLUMNAS_MAPA; i++)
-                printf("|       ");
-            printf("|\n");
+                            printf("|");
+                            printf("%*s", izq, "");
+                            printf("%s", fila[i]);
+                            printf("%*s", der, "");
+                        }
+                    }
+                    else
+                    {
+                        for(i = COLUMNAS_MAPA - 1; i >= 0; i--)
+                        {
+                            int len = strlen(fila[i]);
+                            int izq = (ANCHO_CASILLA - len) / 2;
+                            int der = ANCHO_CASILLA - len - izq;
+
+                            printf("|");
+                            printf("%*s", izq, "");
+                            printf("%s", fila[i]);
+                            printf("%*s", der, "");
+                        }
+                    }
+                }
+                else
+                {
+                    for(i = 0; i < COLUMNAS_MAPA; i++)
+                        printf("|%*s", ANCHO_CASILLA, "");
+                }
+
+                printf("|\n");
+            }
 
             imprimirBorde(COLUMNAS_MAPA);
 
@@ -80,36 +105,59 @@ void renderizarMapa(tListaCD *m)
 
     if(numCol > 0)
     {
-        int i;
-
-        fila[numCol] = '\0';
+        int i, j;
 
         imprimirBorde(numCol);
 
-        for(i = 0; i < numCol; i++)
-            printf("|       ");
-        printf("|\n");
-
-        if(numFila % 2 == 0)
+        for(j = 0; j < ALTO_CASILLA; j++)
         {
-            for(i = 0; i < numCol; i++)
-                printf("|   %c   ", fila[i]);
-        }
-        else
-        {
-            for(i = numCol - 1; i >= 0; i--)
-                printf("|   %c   ", fila[i]);
-        }
+            int filaIcono = ALTO_CASILLA / 2;
 
-        printf("|\n");
+            if(j == filaIcono)
+            {
+                if(numFila % 2 == 0)
+                {
+                    for(i = 0; i < numCol; i++)
+                    {
+                        int len = strlen(fila[i]);
+                        int izq = (ANCHO_CASILLA - len) / 2;
+                        int der = ANCHO_CASILLA - len - izq;
 
-        for(i = 0; i < numCol; i++)
-            printf("|       ");
-        printf("|\n");
+                        printf("|");
+                        printf("%*s", izq, "");
+                        printf("%s", fila[i]);
+                        printf("%*s", der, "");
+                    }
+                }
+                else
+                {
+                    for(i = numCol - 1; i >= 0; i--)
+                    {
+                        int len = strlen(fila[i]);
+                        int izq = (ANCHO_CASILLA - len) / 2;
+                        int der = ANCHO_CASILLA - len - izq;
+
+                        printf("|");
+                        printf("%*s", izq, "");
+                        printf("%s", fila[i]);
+                        printf("%*s", der, "");
+                    }
+                }
+            }
+            else
+            {
+                for(i = 0; i < numCol; i++)
+                    printf("|%*s", ANCHO_CASILLA, "");
+            }
+
+            printf("|\n");
+        }
 
         imprimirBorde(numCol);
     }
+
 }
+
 void imprimirBorde(int cantCasillas)
 {
     int i, j;

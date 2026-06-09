@@ -8,6 +8,7 @@
 #define SIN_MEM 1
 #define LISTA_VACIA 2
 #define LISTA_DISPONIBLE 3
+#define NO_ENCONTRADO 3
 
 #define MIN(X, Y) ((X) <= (Y) ? (X) : (Y))
 
@@ -19,6 +20,12 @@ typedef struct sNodoL
 }tNodoL;
 
 typedef tNodoL* tLista;
+
+typedef struct
+{
+    tNodoL *actual;
+    unsigned posicion;
+} tIteradorLista; //onda topicos
 
 ///PRIMITIVAS
 
@@ -41,5 +48,15 @@ int ponerAlFinal(tLista *p, const void *d, unsigned tamBytes);
 int sacarUltimoLista(tLista *p, void *d, unsigned tamBytes);
 
 int verUltimoLista(const tLista *p, void *d, unsigned tamBytes);
+
+void* obtenerPrimeroInfo(tLista *p, tIteradorLista *it);
+
+void* obtenerSiguienteInfo(tIteradorLista *it);
+
+tNodoL* obtenerPrimerNodo(tLista *p, tIteradorLista *it);
+
+tNodoL* obtenerSiguienteNodo(tIteradorLista *it);
+
+int elimDirDeLista(tLista *p, const void *d);
 
 #endif // FUNCIONES_LISTADINAMICA_H_INCLUDED

@@ -2,10 +2,14 @@
 #define RENDER_H_INCLUDED
 
 #include <stdio.h>
-
+#include <string.h>
 #include "../funciones_ListaCircDoble.h"
+#include "../constantes.h"
 
-void renderizarMapa(tListaCD *mapa);
+
+
+void renderizarPantalla(tListaCD *mapa, int vidas, char proteccion, int puntos, char turno, unsigned nTurno);
+
 void imprimirBorde(int cant);
 
 #endif // RENDER_H_INCLUDED

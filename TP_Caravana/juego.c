@@ -1,9 +1,9 @@
 #include "juego.h"
-
-
 #include "GRAFICOS/logica.h"
 #include "GRAFICOS/render.h"
 #include "funciones_ListaCircDoble.h"
+#include "funciones_listaDinamica.h"
+
 
 
 
@@ -37,37 +37,35 @@ int nuevaPartida(const char* nombreJugador, tArbolBinBusq*arbolIndices, FILE*arc
 
 int iniciarPartida(tTablero *tablero,FILE* archPartidas,int idJugador)
 {
-    tListaCD mapa;
-    tJugador *jugador;
-
     ///durante el juego simepre tener puntero a jugador
-    jugador = malloc(sizeof(tJugador));
-    if(jugador == NULL)
-        return SIN_MEMO;
+    tJugador jugador;
+    tListaCD mapa;
+    tLista bandidosGlobales;
+    tPartida registroPartida;
+    unsigned turno = 0;
 
     crearListaCD(&mapa);
 
-    ///cree la lista dinamica y sus nodos tienen toda la info
-    cargarMapa(&mapa, jugador, tablero->vidasInicio);
+    crearLista(&bandidosGlobales);
 
-    int turno=0;
-    //while(jugador->vidas != 0)
-    while(turno!=10) //pa testeos
+    ///cargo la listaCD y todos los bandidos
+    cargarMapa(&mapa, &jugador, tablero->vidasInicio, &bandidosGlobales);
+
+    while(jugador.vidas != 0 && ((tTerreno*)jugador.posActual->info)->icon != ICON_SALIDA)
     {
-        renderizarMapa(&mapa);
+        renderizarPantalla(&mapa, jugador.vidas, jugador.proteccion, jugador.puntos, jugador.turno, turno);
 
-        procesarTurno(&mapa, jugador);
+        procesarTurno(&mapa, &jugador, &bandidosGlobales, turno);
+
         turno++;
     }
-
-    tPartida registroPartida;
 
     registroPartida.idPartida = obtenerUltimoIdPartida(archPartidas) + 1;
     registroPartida.idJugador = idJugador;//guardamos el id real
 
-    registroPartida.puntaje = jugador->puntos;
-    registroPartida.cantMovimientos = jugador->turno;
-    registroPartida.vidasRestantes = jugador->vidas;
+    registroPartida.puntaje = jugador.puntos;
+    registroPartida.cantMovimientos = turno;
+    registroPartida.vidasRestantes = jugador.vidas;
 
     //grabamos al final
     fseek(archPartidas, 0, SEEK_END);
@@ -80,12 +78,11 @@ int iniciarPartida(tTablero *tablero,FILE* archPartidas,int idJugador)
 
 
     vaciarListaCD(&mapa);
-    free(jugador);
+    vaciarLista(&bandidosGlobales);
     //y free para todos los bandidos secuencialmente
 
-    return TODO_OK;
+    return jugador.vidas ? SI : NO;
 }
-
 
 void mostrarReglas()
 {
