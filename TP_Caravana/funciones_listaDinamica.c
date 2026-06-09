@@ -1,5 +1,5 @@
 #include "funciones_listaDinamica.h"
-
+#include <stdio.h>
 
 void crearLista(tLista *p)
 {
@@ -9,7 +9,6 @@ void crearLista(tLista *p)
     //(p) es el puntero al puntero del main
     *p = NULL;
 }
-
 
 int listaVacia(const tLista *p)
 {
@@ -160,4 +159,64 @@ void* obtenerSiguienteInfo(tIteradorLista *it)
     return it->actual->info;
 }
 
+tNodoL* obtenerPrimerNodo(tLista *p, tIteradorLista *it)
+{
+    if(*p == NULL)
+        return NULL;
 
+    it->actual = *p;
+    it->posicion = 0;
+
+    return it->actual;
+}
+
+tNodoL* obtenerSiguienteNodo(tIteradorLista *it)
+{
+    if(it->actual == NULL || it->actual->sig == NULL)
+        return NULL;
+
+    it->actual = it->actual->sig;
+    it->posicion++;
+
+    return it->actual;
+}
+
+int elimDirDeLista(tLista *p, const void *d)
+{
+    tNodoL *anterior = NULL, *aEliminar = NULL;
+
+    //si la lista esta vacia
+    if(!*p)
+        return LISTA_VACIA;
+
+    //itero hasta llegar a fin de lista o encontrar la direccion
+    while(*p && (tNodoL*)d != *p)
+    {
+        anterior = *p;
+        p = &(*p)->sig;
+    }
+
+    //si llegue a fin de lista no lo encontre
+    if(!*p)
+    {
+        puts("\nbandido HGHFH");
+        system("pause");
+        return NO_ENCONTRADO;
+
+    }
+
+    //antes de modificar *p
+    aEliminar = *p;
+
+    //si lo encontre, lo engancho
+    if(anterior)
+        anterior->sig = aEliminar->sig;
+    else
+        *p = aEliminar->sig;
+
+    //elimino el nodo
+    free(aEliminar->info);
+    free(aEliminar);
+
+    return EXITO;
+}

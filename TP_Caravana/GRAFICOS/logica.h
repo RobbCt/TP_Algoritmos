@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <windows.h>
 #include "../constantes.h"
 #include "../funciones_colaDinamica.h"
 #include "../funciones_ListaCircDoble.h"
@@ -20,7 +21,7 @@ typedef struct
     char icon;
     char proteccion;
     char turno; //tiene tuno para tirar?
-    unsigned vidas;
+    unsigned vidas; ///vidas restantes? gano; perdio;
     int puntos;
     tNodo *posActual;
 }tJugador;

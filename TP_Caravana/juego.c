@@ -31,7 +31,7 @@ int nuevaPartida(const char* nombreJugador)
     return TODO_OK;
 }
 
-int iniciarPartida(tTablero *tablero)
+char iniciarPartida(tTablero *tablero)
 {
     ///durante el juego simepre tener puntero a jugador
     tJugador jugador;
@@ -46,7 +46,7 @@ int iniciarPartida(tTablero *tablero)
     ///cargo la listaCD y todos los bandidos
     cargarMapa(&mapa, &jugador, tablero->vidasInicio, &bandidosGlobales);
 
-    while(jugador.vidas != 0)
+    while(jugador.vidas != 0 && ((tTerreno*)jugador.posActual->info)->icon != ICON_SALIDA)
     {
         renderizarPantalla(&mapa, jugador.vidas, jugador.proteccion, jugador.puntos, jugador.turno, turno);
 
@@ -59,7 +59,7 @@ int iniciarPartida(tTablero *tablero)
     vaciarLista(&bandidosGlobales);
     //y free para todos los bandidos secuencialmente
 
-    return TODO_OK;
+    return jugador.vidas ? SI : NO;
 }
 
 void mostrarReglas()

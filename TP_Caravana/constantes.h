@@ -37,5 +37,10 @@
 #define CASILLERO_OASIS      5
 #define CASILLERO_TORMENTA   6
 
+//controles movimientos
+#define SI          'Y'
+#define NO          'N'
+#define AVANZAR     'A'
+#define RETROCEDER  'R'
 
 #endif // CONSTANTES_H_INCLUDED

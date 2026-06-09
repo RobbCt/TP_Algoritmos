@@ -31,7 +31,6 @@ void cargarMovJugador(tMovimiento *mov, tJugador *jugador);
 void cargarMovBandido(tMovimiento *mov, tBandido *bandido, unsigned turno);
 
 
-
 int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlobales)
 {
     FILE *pf = fopen(CARAVANA_ARCH, "rt");
@@ -52,8 +51,8 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlo
         terreno.jugador = 1;
 
         jugador->icon = ICON_JUGADOR;
-        jugador->proteccion = 'N';
-        jugador->turno = 'Y';
+        jugador->proteccion = NO;
+        jugador->turno = SI;
         jugador->vidas = vidasJugador;
         jugador->puntos = 0;
 
@@ -127,8 +126,8 @@ void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigne
     tIteradorLista it;
     tBandido *bandido;
 
-    crearCola( &colaMovimientos);
-    if(jugador->turno=='Y')
+    crearCola(&colaMovimientos);
+    if(jugador->turno == SI)
     {
         cargarMovJugador(&mov, jugador);
         ponerEnCola(&colaMovimientos, &mov, sizeof(mov));
@@ -136,12 +135,8 @@ void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigne
     else
     {
         puts("Turno perdido por tormenta");
-        //SLEEP
-
+        Sleep(5000);
     }
-
-
-    //MOVIMIENTO BANDIDOS aca se debe calcular el movimiento de los bandidos y acolar en colaMovimientos
 
     ///calculo el movimiendo de cada bandido
     bandido = (tBandido*)obtenerPrimeroInfo(bGlobales, &it);
@@ -291,12 +286,18 @@ int calcularTemperaturaMov(tBandido *bandido, tNodo *destino, char sentido, unsi
 
 int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, tListaCD* mapa, unsigned turno)
 {
-    tTerreno *terreno;
-    tIteradorLista it;
+    tTerreno *terreno = NULL;
+    tBandido *bandidoN = NULL;
+    tNodoL *dirBandidoN = NULL;
+    tIteradorLista itInfoBand;
+    tIteradorLista itDirBand;
     tMovimiento movArealizar;
-    tBandido *bandidoN;
+
+
     sacarDeCola(colaMovimientos, &movArealizar, sizeof(tMovimiento));
-    if(j->turno=='Y')
+
+
+    if(j->turno == SI)
     {
         ///sacar jugador de casilla actual
         terreno = (tTerreno*)j->posActual->info;
@@ -307,36 +308,40 @@ int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, 
         j->posActual = movArealizar.destino;
         terreno = (tTerreno*)j->posActual->info;
         terreno->jugador = 1;
+
+        //terreno es el destino del jugador
+        switch(terreno->icon)
+        {
+            case ICON_TORMENTA:
+                j->turno = NO;
+                terreno->icon = ICON_PUNTO; //el jugador hace desaparecer la tormenta?
+                break;
+
+            case ICON_OASIS:
+                j->proteccion = SI;
+                terreno->icon = ICON_PUNTO;//el jugador hace desaparecer el oasis?
+                break;
+
+            case ICON_PREMIO:
+                j->puntos++; //ajustar dependiendo de como funcione el sistema de puntos
+                terreno->icon = ICON_PUNTO;
+                break;
+
+            case ICON_VIDA:
+                j->vidas++;
+                terreno->icon = ICON_PUNTO;
+                break;
+
+            case ICON_SALIDA:
+                return EXITO;
+
+        }
     }
     else
-    {
-        j->turno='Y';
-    }
+        j->turno = SI;
 
-    if(terreno->icon=='T') //recomendacion: poner un mensaje que indique la colision producida
-    {
-        j->turno='N';
-        terreno->icon='.';
-    }
-     if(terreno->icon=='O')
-    {
-        j->proteccion='Y';
-        terreno->icon='.';
-    }
-
-     if(terreno->icon=='P')
-    {
-        j->puntos++; //ajustar dependiendo de como funcione el sistema de puntos
-        terreno->icon='.';
-    }
-
-     if(terreno->icon=='V')
-    {
-        j->vidas++;
-        terreno->icon='.';
-    }
-
-    bandidoN = (tBandido*)obtenerPrimeroInfo(bGlobales, &it);
+    bandidoN = (tBandido*)obtenerPrimeroInfo(bGlobales, &itInfoBand);
+    dirBandidoN = obtenerPrimerNodo(bGlobales, &itDirBand);
     while(bandidoN != NULL)
     {
         sacarDeCola(colaMovimientos, &movArealizar, sizeof(tMovimiento));
@@ -352,25 +357,35 @@ int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, 
         terreno->TurnoActualizado = turno;
 
         bandidoN->ultimoMov = movArealizar.direccion;
-        if(bandidoN->posActual == j->posActual && j->proteccion== 'N')
-        {
-            j->vidas--;
-            //terreno->bandidos -= 1;
-            //sacarbandido de la lista
-            //sacarListaClave(bGlobales, bandidoN, sizeof(bandidoN))
 
-        }
-        else if (bandidoN->posActual==j->posActual && j->proteccion=='Y')
+        //j->posActual->info->bandidos > 0
+        if(bandidoN->posActual == j->posActual)
         {
-            j->proteccion='N';
-            //IMPRIMIR QUE EL JUGADOR NO PERDIO VIDA POR PROTECCION
+            //en una colison [B J] el bandido muere siempre
+            terreno->bandidos -= 1;
+            elimDirDeLista(bGlobales, dirBandidoN);
+
+            //q pasa con el jugador?
+            if(j->proteccion == NO)
+            {
+                j->vidas--;
+                j->posActual = *mapa;
+                terreno->jugador = 0;
+                ((tTerreno*)(*mapa)->info)->jugador = 1;
+                printf("\nperdiste una vida pero te cargaste al bandido!");
+            }
+            else
+            {
+                j->proteccion = NO;
+                printf("\nsobreviviste por la proteccion y te cargaste al bandido!");
+            }
+
+            Sleep(5000);
         }
-        bandidoN = (tBandido*)obtenerSiguienteInfo(&it);
+
+        bandidoN = (tBandido*)obtenerSiguienteInfo(&itInfoBand);
+        dirBandidoN = obtenerSiguienteNodo(&itDirBand);
     }
-
-
-    ///aca abria q evaluar colisiones de jugador-bandido
-    ///jugador-oasis, jugadoir-vida extra...
 
     return EXITO;
 }
@@ -465,7 +480,5 @@ void cargarMovBandido(tMovimiento *mov, tBandido *bandido, unsigned turnoAc)
 {
     IABandidos(mov, bandido, turnoAc);
 }
-
-
 
 
