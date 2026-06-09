@@ -18,6 +18,8 @@ typedef struct
 
 typedef struct
 {
+    int id;
+    //char nombre[30];
     char icon;
     char proteccion;
     char turno; //tiene tuno para tirar?

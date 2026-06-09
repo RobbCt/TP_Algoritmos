@@ -4,7 +4,7 @@
 int generarTablero(tTablero *tab, char *nArch)
 {
     FILE* pf=fopen(nArch, "wt");
-    int totalEventos, casillasJugables;
+    int totalEventos, casillasJugables, bandEnSalida=0;
 
     ///bajamos define's a vector
     char icons[]= {
@@ -26,6 +26,16 @@ int generarTablero(tTablero *tab, char *nArch)
         return ERROR_TABLERO;
     }
 
+    //aumentamos las posibilidades de q hayan bandidos en la salida al iniciar partida
+    if(tab->cantBand > 0) //3
+    {
+        if(rand()%2) //xx
+        {
+            bandEnSalida = rand() % tab->cantBand + 1;
+            tab->cantBand -= bandEnSalida;
+        }
+    }
+
     ///validamos si es jugable el tablero
     totalEventos=tab->cantBand +tab->cantPrem +tab->cantPlusV +tab->cantOasis +tab->cantTorm;
     casillasJugables= tab->cantPos-2;
@@ -41,89 +51,27 @@ int generarTablero(tTablero *tab, char *nArch)
         generarPorPaquetes(pf,tab,icons);
     //si hay más eventos que casillas, se generan paquetes [BB, VT, BP, etc] - prox validar combos posible¿
 
-    fprintf(pf, "%02d:%c\n", tab->cantPos, icons[8]);//seteamos salida al final
-
-/*
-    if(cantPuntos<0) //juntamos combos al azar
+    //seteamos salida al final
+    if(bandEnSalida==0)
+        fprintf(pf, "%02d:%c\n", tab->cantPos, icons[8]);
+    else
     {
-        puts("config.txt no aceptable para el tablero, modifiquelo y reintente...");
-        fclose(pf);
-        return ERROR_TABLERO;
+        int i;
+
+        fprintf(pf, "%02d:[%c", tab->cantPos, icons[8]);
+
+        for(i=0; i<bandEnSalida; i++)
+            fprintf(pf, "%c", icons[CASILLERO_BANDIDO]);
+
+        fprintf(pf, "]\n");
     }
-*/
+
     ///...creamos y asignamos q habra en todos los casilleros del tablero
-    /*
-    while(i<tab->cantPos)
-    {
-        int random= valRandom(tab, cantPuntos, iconAnt);
 
-        switch(random)
-        {
-            case CASILLERO_PUNTO: cantPuntos--; break;
-            case CASILLERO_BANDIDO: tab->cantBand--; break;
-            case CASILLERO_PREMIO: tab->cantPrem--;  break;
-            case CASILLERO_VIDA: tab->cantPlusV--; break;
-            case CASILLERO_OASIS: tab->cantOasis--; break;
-            case CASILLERO_TORMENTA: tab->cantTorm--; break;
-        }
-
-        iconAnt=random;
-
-        fprintf(pf, "%02d:%c\n", i, icons[random]);
-        i++;
-    }
-
-    ///de ser terminado 0n:S
-    fprintf(pf, "%02d:%c\n", i, icons[8]);//seteamos salida al final
-*/
     ///tablero "caravana.txt" creado
     fclose(pf);
     return TODO_OK;
 }
-/*
-int valRandom(tTablero* tab, int posiciones, int anterior)
-{
-    ///se itera aleatoriamente hasta elegir q hay en cada casillero
-    ///(respetando cantidades y secuencias)
-    int random, valido;
-
-    do
-    {
-        valido=1;
-        random = rand()%6+1;
-
-        switch(random)
-        {
-            case CASILLERO_PUNTO:
-                if(posiciones<=0)
-                    valido=0;
-                break;
-            case CASILLERO_BANDIDO:
-                if(tab->cantBand <= 0 ||  ((anterior==CASILLERO_BANDIDO || anterior==CASILLERO_TORMENTA) && posiciones > 0))
-                    valido=0;
-                break;
-            case CASILLERO_PREMIO:
-                if(tab->cantPrem <= 0 || (anterior!=CASILLERO_PUNTO && posiciones!=0))
-                    valido=0;
-                break;
-            case CASILLERO_VIDA:
-                if(tab->cantPlusV <= 0 || (anterior!=CASILLERO_PUNTO && posiciones!=0))
-                    valido=0;
-                break;
-            case CASILLERO_OASIS:
-                if(tab->cantOasis <= 0 || (anterior!=CASILLERO_PUNTO && posiciones!=0))
-                    valido=0;
-                break;
-            case CASILLERO_TORMENTA:
-                if(tab->cantTorm <= 0 || ((anterior==CASILLERO_BANDIDO || anterior==CASILLERO_TORMENTA) && posiciones > 0))
-                    valido=0;
-                break;
-        }
-    }while(!valido);
-
-    return random;
-}
-*/
 
 int generarPorZonas(FILE* pf, tTablero* tab, char icons[])
 {
