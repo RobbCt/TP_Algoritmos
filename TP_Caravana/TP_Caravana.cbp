@@ -39,11 +39,22 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="GRAFICOS/render.h" />
+		<Unit filename="TDAvector.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="TDAvector.h" />
+		<Unit filename="arbolBB.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="arbolBB.h" />
 		<Unit filename="config.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="config.h" />
 		<Unit filename="constantes.h" />
+		<Unit filename="debug.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="funciones_ListaCircDoble.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -52,6 +63,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="funciones_listaDinamica.h" />
+		<Unit filename="gestionDatos.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gestionDatos.h" />
 		<Unit filename="juego.c">
 			<Option compilerVar="CC" />
 		</Unit>

@@ -1,31 +1,27 @@
 #include "ranking.h"
 
-int verRanking()
+int verRanking(FILE* archJugadores, FILE* archPartidas)
 {
-    FILE* archJugadores, *archPartidas;
     unsigned cantJugadores;
     Vector vRanking;
     tPartida partida;
     tRanking ranking;
 
     ///ver cantidad de jugadores
-    if(abrirArchivo(&archJugadores,JUGADORES,"rb")!=TODO_OK)
-        return ERROR_ARCHIVO;
     fseek(archJugadores,0,SEEK_END);
     cantJugadores= ftell(archJugadores)/sizeof(tJugadorIndice);
-    fclose(archJugadores);
 
     if(cantJugadores==0)
         return SIN_JUGADOR;
 
-    if(abrirArchivo(&archPartidas,PARTIDAS,"rb")!=TODO_OK)
+    if(!archPartidas)
         return ERROR_ARCHIVO;
 /// CREAR VECTOR ranking
     if(crearVector(&vRanking,sizeof(tRanking), cantJugadores)!=TODO_OK)
-    {
-        fclose(archPartidas);
         return SIN_MEMO;
-    }
+
+    fseek(archPartidas, 0, SEEK_SET);
+
     while(fread(&partida,sizeof(tPartida),1,archPartidas))
     {
         tRanking* posJugador= busquedaSecuencialVector(&vRanking,&(partida.idJugador),compararRankingPorJugador);
@@ -35,9 +31,9 @@ int verRanking()
             ranking.idJugador=partida.idJugador;
             ranking.puntajeTotal=partida.puntaje;
             ranking.cantMovimientosTotales=partida.cantMovimientos;
+
             if(insertarAlFinalVector(&vRanking,&ranking)!=TODO_OK)
             {
-                fclose(archPartidas);
                 destruirVector(&vRanking);
                 return SIN_MEMO;
             }
@@ -48,10 +44,20 @@ int verRanking()
             posJugador->cantMovimientosTotales+=partida.cantMovimientos;
         }
     }
-    fclose(archPartidas);
+
     /// ordenar por puntaje
-    qsort(vRanking.vec, vRanking.cantElem, sizeof(tRanking),compararRankingPorPuntaje);
+    //mantenemos las primitivas sin acceder a los elems del tdavector
+    ordenarVector(&vRanking, compararRankingPorPuntaje);
+
+    printf("\n=========================================");
+    printf("\n  RANKING DE JUGADORES");
+    printf("\n=========================================");
+    printf("\n%5s %10s %15s", "ID", "PUNTOS", "MOVIMIENTOS");
+    printf("\n-----------------------------------------");
+
     recorrerVector(&vRanking,mostrarRanking);
+    printf("\n=========================================\n\n");
+
     destruirVector(&vRanking);
     return TODO_OK;
 }
@@ -60,6 +66,11 @@ int compararRankingPorPuntaje(const void* a, const void* b)
 {
     const tRanking* jugador1=a;
     const tRanking* jugador2=b;
+
+    //si tienen ==puntaje, desempatamos con el mas eficiente¿ (menos movs)
+    if (jugador1->puntajeTotal == jugador2->puntajeTotal)
+        return jugador1->cantMovimientosTotales-jugador2->cantMovimientosTotales;
+
     return jugador2->puntajeTotal - jugador1->puntajeTotal;
 }
 int compararRankingPorJugador(const void* id, const void* ranking)
@@ -86,68 +97,4 @@ int abrirArchivo(FILE** pf, const char* nombreArchivo, const char* modo)
     return TODO_OK;
 }
 
-int crearVector(Vector* vec, unsigned tamElem, unsigned tamInicial)
-{
-    vec->vec=malloc(tamElem*tamInicial);
-    if(!vec->vec)
-        return SIN_MEMO;
-    vec->tamElem=tamElem;
-    vec->cantElem=0;
-    vec->tamV=tamInicial;
-    return TODO_OK;
-}
-void destruirVector(Vector* vec)
-{
-    free(vec->vec);
-}
-int realocar(Vector* vec, unsigned ntamV) ///REZISE
-{
-    void*nvec=realloc(vec->vec,ntamV* vec->tamElem);
-    if(!nvec)
-        return SIN_MEMO;
-    vec->vec=nvec;
-    vec->tamV=ntamV;
-    return TODO_OK;
-}
-int insertarAlFinalVector(Vector* vec, const void* elem)
-{
-    void* ult;
-    if(vec->cantElem==vec->tamV)
-    {
-        if(realocar(vec, 2*vec->tamV)!=TODO_OK)
-            return SIN_MEMO;
-    }
-    ult= vec->vec+vec->cantElem*vec->tamElem;
-    memcpy(ult, elem, 1*vec->tamElem);
-    vec->cantElem++;
-    return TODO_OK;
-}
-
-void* busquedaSecuencialVector(const Vector* vec, const void* elem, int cmp(const void*, const void*))
-{
-    void* pvec;
-    void* ult;
-    if(vec->cantElem == 0)
-        return NULL;
-
-    pvec=vec->vec;
-    ult=pvec+(vec->cantElem-1)*vec->tamElem;
-    while(pvec<=ult)
-    {
-        if(cmp(elem, pvec)==0)
-            return pvec;
-        pvec+=vec->tamElem;
-    }
-    return NULL;
-}
-void recorrerVector(Vector* vec, void accion (void*))
-{
-    int i=0;
-    void* pvec=vec->vec;
-    for(i=0; i<vec->cantElem; i++)
-    {
-        accion(pvec);
-        pvec+=vec->tamElem;
-    }
-}
 

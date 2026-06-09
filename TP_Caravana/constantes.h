@@ -8,19 +8,21 @@
 #define ERROR_PARTIDA    3
 #define ERROR_CONFIG     4
 #define SIN_MEMO         5
-#define SIN_JUGADOR 6
+#define SIN_JUGADOR      6
 #define JUGADOR_EXISTENTE 7
+#define DUPLICADO        8
 
 //tamaños def
 #define TAMLINEA        100
 #define TAM_NOMBRE       50
 
 //rutas archs
-#define CONFIG_ARCH      "config.txt"
-#define CARAVANA_ARCH    "caravana.txt"
+#define CONFIG_ARCH         "config.txt"
+#define CARAVANA_ARCH       "caravana.txt"
 ///#define RANKING_ARCH     "ranking.dat"
-#define JUGADORES        "jugadores.bin"
-#define PARTIDAS         "partidas.bin"
+#define JUGADORES_ARCH      "jugadores.bin"
+#define PARTIDAS_ARCH       "partidas.bin"
+#define INDICE_ARCH         "indices.dat" //para acceder al abb
 
 
 //valores tablero

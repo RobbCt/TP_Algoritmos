@@ -1,8 +1,10 @@
 # depslib dependency file v1.0
-1777659335 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\main.c
+1780966475 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\main.c
 	"juego.h"
+	"arbolBB.h"
+	"gestionDatos.h"
 
-1777657415 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\config.c
+1778428085 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\config.c
 	"config.h"
 
 1777658087 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\config.h
@@ -12,29 +14,33 @@
 	"tipos.h"
 	"constantes.h"
 
-1777657162 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\tipos.h
+1778450313 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\tipos.h
 
-1777657949 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\constantes.h
+1780965635 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\constantes.h
 
-1777657973 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\juego.c
+1780965588 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\juego.c
 	"juego.h"
+	"GRAFICOS/logica.h"
+	"GRAFICOS/render.h"
+	"funciones_ListaCircDoble.h"
 
-1777658132 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\juego.h
+1780966398 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\juego.h
 	<stdio.h>
 	<stdlib.h>
 	<time.h>
 	"tipos.h"
 	"tablero.h"
 	"constantes.h"
+	"ranking.h"
+	"arbolBB.h"
+	"gestionDatos.h"
 
-1777658391 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\tablero.h
-	<stdio.h>
-	<stdlib.h>
+1778461680 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\tablero.h
 	"tipos.h"
 	"constantes.h"
 	"config.h"
 
-1777659626 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\tablero.c
+1780932714 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\tablero.c
 	"tablero.h"
 
 1778259704 source:c:\users\rober\desktop\tp-algo\tp_caravana\config.c
@@ -181,4 +187,73 @@
 
 1780077571 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\tablero.c
 	"tablero.h"
+
+1780327747 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_listacircdoble.c
+	"funciones_ListaCircDoble.h"
+
+1780327747 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_listacircdoble.h
+	<stdlib.h>
+	<string.h>
+
+1780930883 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_listadinamica.c
+	"funciones_listaDinamica.h"
+
+1780930883 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_listadinamica.h
+	<stdlib.h>
+	<string.h>
+
+1780930882 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\graficos\logica.c
+	"../constantes.h"
+	"logica.h"
+
+1780930882 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\graficos\logica.h
+	<stdio.h>
+	"../funciones_ListaCircDoble.h"
+
+1780930883 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\graficos\render.c
+	"render.h"
+	"logica.h"
+
+1780930883 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\graficos\render.h
+	<stdio.h>
+	"../funciones_ListaCircDoble.h"
+
+1780965898 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\ranking.h
+	"config.h"
+	"gestionDatos.h"
+	"TDAvector.h"
+
+1780971548 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\ranking.c
+	"ranking.h"
+
+1780965854 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\arbolbb.c
+	"arbolBB.h"
+
+1780969698 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\arbolbb.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"config.h"
+
+1780969340 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\gestiondatos.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"arbolBB.h"
+
+1780936839 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\tdavector.h
+	"config.h"
+
+1780936721 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\tdavector.c
+	"TDAvector.h"
+
+1780968847 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\gestiondatos.c
+	"gestionDatos.h"
+
+1780969681 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\debug.c
+	<stdio.h>
+	<stdlib.h>
+	"gestionDatos.h"
+	"arbolBB.h"
 
