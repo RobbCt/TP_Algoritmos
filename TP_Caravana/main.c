@@ -1,9 +1,28 @@
 #include "juego.h"
+#include "arbolBB.h"
+#include "gestionDatos.h"
 
 int main()
 {
     int opc;
+    char nombre[TAM_NOMBRE];
     srand(time(NULL));
+
+    tArbolBinBusq arbolIdx;
+    FILE* archJugadores;
+    FILE* archPartidas;
+
+    crearArbolBinBusq(&arbolIdx);
+
+    if(abrirArchivo(&archJugadores, JUGADORES_ARCH, "a+b") != TODO_OK)
+        return ERROR_ARCHIVO;
+    if(abrirArchivo(&archPartidas, PARTIDAS_ARCH, "a+b") != TODO_OK)
+    {
+        fclose(archJugadores);
+        return ERROR_ARCHIVO;
+    }
+
+    cargarIdxDesdeArch(&arbolIdx, INDICE_ARCH);
 
     do
     {
@@ -19,21 +38,22 @@ int main()
 
         switch(opc)
         {
-            char nombre[TAM_NOMBRE];
             case 1:
                 printf("Ingrese su nombre:");
                 fflush(stdin);
                 fgets(nombre, TAM_NOMBRE, stdin);
-                nuevaPartida(nombre);
+                nuevaPartida(nombre, &arbolIdx, archJugadores, archPartidas);
                 system("pause");
                 break;
             case 2:
                 mostrarReglas();
                 break;
             case 3:
-                verRanking();
+                verRanking(archJugadores, archPartidas);
+                system("pause");
                 break;
             case 4:
+                guardarIdxEnArch(&arbolIdx, INDICE_ARCH);//actualizamos idx cada q salimos del juego¿¿
                 puts("Saliendo..");
                 system("pause");
                 break;
@@ -44,6 +64,10 @@ int main()
         }
         system("cls");
     }while(opc!=4);
+
+    vaciarArbolBinBusq(&arbolIdx);
+    fclose(archJugadores);
+    fclose(archPartidas);
 
     return TODO_OK;
 }
