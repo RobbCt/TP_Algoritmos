@@ -36,11 +36,12 @@ int main()
         printf("Opcion: ");
         scanf("%d", &opc);
 
+        int c;
+        while((c = getchar()) != '\n' && c != EOF);
         switch(opc)
         {
             case 1:
                 printf("Ingrese su nombre:");
-                fflush(stdin);
                 fgets(nombre, TAM_NOMBRE, stdin);
                 nuevaPartida(nombre, &arbolIdx, archJugadores, archPartidas);
                 system("pause");

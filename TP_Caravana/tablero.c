@@ -60,7 +60,7 @@ int generarTablero(tTablero *tab, char *nArch)
 
         fprintf(pf, "%02d:[%c", tab->cantPos, icons[8]);
 
-        for(i=0; i<bandEnSalida; i++)
+         for(i=0; i<bandEnSalida; i++)
             fprintf(pf, "%c", icons[CASILLERO_BANDIDO]);
 
         fprintf(pf, "]\n");
