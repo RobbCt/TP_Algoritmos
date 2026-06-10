@@ -37,7 +37,12 @@ typedef struct
 
 typedef struct
 {
-    char icon;
+    unsigned puntos;
+    unsigned oasis;
+    unsigned tormenta;
+    unsigned vidas;
+    unsigned salida;
+    unsigned inicio; //temporal, quiero analizar si sirve
     //int tempTemporal; //para algoritmo de bandidos (caliente, frio)
     unsigned TurnoActualizado;
     unsigned bandidos;
@@ -55,5 +60,7 @@ void IABandidos(tMovimiento *mov, tBandido *bandido, unsigned turnoAc);
 int calcularTemperaturaMov(tBandido *bandido, tNodo *destino, char direccion, unsigned turnoAc);
 
 int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, tListaCD* mapa, unsigned turno);
+
+int posicionJugador(tJugador* j);
 
 #endif // LOGICA_H_INCLUDED

@@ -21,17 +21,34 @@ void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, cha
     do
     {
         tTerreno *terreno = (tTerreno*)act->info;
-
-        if(terreno->jugador)
+        if(terreno->jugador && terreno->inicio)
+            sprintf(fila[numCol], "I + %c", ICON_JUGADOR);
+        else if(terreno->jugador && !terreno->inicio)
+        {
             sprintf(fila[numCol], "%c", ICON_JUGADOR);
-        else if(terreno->bandidos > 1)
+        }
+        else if(terreno->bandidos == 1 && terreno->salida)
+        {
+            sprintf(fila[numCol], "S + B");
+
+            //bandidosImpresos++;
+            //bandidosExistentes += terreno->bandidos;
+        }
+        else if(terreno->bandidos > 1 && terreno->salida)
+        {
+            sprintf(fila[numCol], "S + Bx%u", terreno->bandidos);
+
+            //bandidosImpresos++;
+            //bandidosExistentes += terreno->bandidos;
+        }
+        else if(terreno->bandidos > 1 && !terreno->salida)
         {
             sprintf(fila[numCol], "Bx%u", terreno->bandidos);
 
             //bandidosImpresos++;
             //bandidosExistentes += terreno->bandidos;
         }
-        else if(terreno->bandidos == 1)
+        else if(terreno->bandidos == 1 && !terreno->salida)
         {
             sprintf(fila[numCol], "%c", ICON_BANDIDO);
 
@@ -39,7 +56,25 @@ void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, cha
             //bandidosExistentes++;
         }
         else
-            sprintf(fila[numCol], "%c", terreno->icon);
+
+        {
+            if(terreno->vidas)
+                sprintf(fila[numCol], "V");
+            if(terreno->puntos)
+                sprintf(fila[numCol], "P");
+            if(terreno->oasis)
+                sprintf(fila[numCol], "O");
+            if(terreno->tormenta)
+                sprintf(fila[numCol], "T");
+            if(terreno->salida)
+                sprintf(fila[numCol], "S");
+            if(terreno->inicio)
+                sprintf(fila[numCol], "I");
+            else if(!terreno->vidas && !terreno->puntos && !terreno->oasis && !terreno->tormenta && !terreno->salida)
+                sprintf(fila[numCol], ".");
+
+        }
+
 
         numCol++;
 
