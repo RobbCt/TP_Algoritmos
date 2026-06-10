@@ -27,6 +27,7 @@ typedef struct
 unsigned tirarDado();
 char iconoDeLinea(char* linea);
 int verificar(tListaCD *m);
+int contarBandidosEnCasilla(char *linea);
 void cargarMovJugador(tMovimiento *mov, tJugador *jugador);
 void cargarMovBandido(tMovimiento *mov, tBandido *bandido, unsigned turno);
 
@@ -44,11 +45,17 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlo
     fgets(linea, sizeof(linea), pf);
     if(strcmpi(linea,"01:[I J]\n") == 0)
     {
-        terreno.icon = ICON_INICIO;
+
         //terreno.tempTemporal = 0;
+        terreno.inicio = 1;
         terreno.TurnoActualizado = 0;
         terreno.bandidos = 0;
         terreno.jugador = 1;
+        terreno.oasis=0;
+        terreno.puntos=0;
+        terreno.salida=0;
+        terreno.tormenta=0;
+        terreno.vidas=0;
 
         jugador->icon = ICON_JUGADOR;
         jugador->proteccion = NO;
@@ -76,22 +83,50 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlo
         {
             //bandidos en terreno
 
-            terreno.icon = ICON_PUNTO;
+            //terreno.icon = ICON_PUNTO;
             //terreno.tempTemporal = 0;
+            terreno.inicio = 0;
             terreno.TurnoActualizado = 0;
             terreno.jugador = 0;
-            terreno.bandidos = 1;
-
-            bandido.icon = ICON_BANDIDO;
-            bandido.ultimoMov = '\0';
+            terreno.bandidos = contarBandidosEnCasilla(linea);
+            terreno.oasis=0;
+            terreno.vidas=0;
+            terreno.puntos=0;
+            terreno.tormenta=0;
+            terreno.salida=0;
         }
         else
         {
+            terreno.inicio = 0;
+            terreno.oasis = 0;
+            terreno.vidas = 0;
+            terreno.puntos = 0;
+            terreno.tormenta = 0;
+            terreno.salida = 0;
+            terreno.bandidos = 0;
+
+            //pongo ++ para casos donde items>casillas
+            if(icon == 'O')
+                terreno.oasis=1;
+
+            if(icon == 'P')
+                terreno.puntos=1;
+
+            if(icon == 'V')
+                terreno.vidas=1;
+
+            if(icon == 'T')
+                terreno.tormenta=1;
+
+            if(icon == 'S')
+                {
+                    terreno.salida=1; //solo puede haber una salida
+                    terreno.bandidos = contarBandidosEnCasilla(linea);
+                }
             //puntos, tormentas, oasis, vidas, salida en terreno
-            terreno.icon = icon;
+
             //terreno.tempTemporal = 0;
             terreno.TurnoActualizado = 0;
-            terreno.bandidos = 0;
             terreno.jugador = 0;
         }
 
@@ -101,10 +136,14 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlo
         ///posicion de bandido (cada uno apunta a su nodo)
         if(terreno.bandidos)
         {
-            //anterior al primer nodo = ultimo nodo agregado
-            bandido.posActual = (*mapa)->ant;
-            //bandido cargado, lo enlistamos en bandidos Gloables
-            ponerAlFinal(bGlobales, &bandido, sizeof(bandido));
+            for(int i = 0; i < terreno.bandidos; i++)
+            {
+                bandido.icon = ICON_BANDIDO;
+                bandido.ultimoMov = '\0';
+                bandido.posActual = (*mapa)->ant;
+
+                ponerAlFinal(bGlobales, &bandido, sizeof(bandido));
+            }
         }
 
     }
@@ -116,6 +155,20 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlo
 
     fclose(pf);
     return TODO_OK;
+}
+
+int contarBandidosEnCasilla(char* linea)
+{
+    int i=0;
+    int cant=0;
+    while(*(linea+i))
+    {
+        if(*(linea+i)=='B')
+            cant++;
+
+        i++;
+    }
+    return cant;
 }
 
 void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigned turno) //considerando hacerlo int y usar macros para diferentes panoramas
@@ -130,6 +183,7 @@ void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigne
     if(jugador->turno == SI)
     {
         cargarMovJugador(&mov, jugador);
+        Sleep(5000);
         ponerEnCola(&colaMovimientos, &mov, sizeof(mov));
     }
     else
@@ -245,7 +299,7 @@ int calcularTemperaturaMov(tBandido *bandido, tNodo *destino, char sentido, unsi
     /// ----- TEMPERATURA PERSISTENTE -----
 
     ///+15 si es terreno clave
-    if(terrenoAc->icon == 'P' || terrenoAc->icon == 'V' || terrenoAc->icon == 'O')
+    if(terrenoAc->puntos > 0 || terrenoAc->vidas > 0 || terrenoAc->oasis > 0)
         temp += CASILLA_CLAVE;
 
     //si el terreno fue visitado en algun turno...
@@ -292,7 +346,8 @@ int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, 
     tIteradorLista itInfoBand;
     tIteradorLista itDirBand;
     tMovimiento movArealizar;
-
+    int protegidoEsteTurno = j->proteccion; //para que la proteccion solo dure un turno
+    j->proteccion = NO;
 
     sacarDeCola(colaMovimientos, &movArealizar, sizeof(tMovimiento));
 
@@ -310,32 +365,40 @@ int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, 
         terreno->jugador = 1;
 
         //terreno es el destino del jugador
-        switch(terreno->icon)
+        if(terreno->tormenta)
         {
-            case ICON_TORMENTA:
+            if(protegidoEsteTurno == SI)
+            {
+                printf("\nUna tormenta te intercepto, pero al estar protegido no pierdes el turno!");
+            }
+            else
+            {
                 j->turno = NO;
-                terreno->icon = ICON_PUNTO; //el jugador hace desaparecer la tormenta?
-                break;
-
-            case ICON_OASIS:
-                j->proteccion = SI;
-                terreno->icon = ICON_PUNTO;//el jugador hace desaparecer el oasis?
-                break;
-
-            case ICON_PREMIO:
-                j->puntos++; //ajustar dependiendo de como funcione el sistema de puntos
-                terreno->icon = ICON_PUNTO;
-                break;
-
-            case ICON_VIDA:
-                j->vidas++;
-                terreno->icon = ICON_PUNTO;
-                break;
-
-            case ICON_SALIDA:
-                return EXITO;
-
+                terreno->tormenta = 0; //el jugador hace desaparecer la tormenta?
+            }
         }
+
+        if(terreno->oasis)
+        {
+            j->proteccion = SI;
+            terreno->oasis = 0;
+        }
+          if(terreno->puntos)
+        {
+            j->puntos++;
+            terreno->puntos = 0;
+        }
+
+           if(terreno->vidas)
+        {
+            j->vidas++;
+            terreno->vidas = 0;
+        }
+
+       // case ICON_SALIDA: considero agregar salida como variables
+
+
+
     }
     else
         j->turno = SI;
@@ -366,7 +429,7 @@ int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, 
             elimDirDeLista(bGlobales, dirBandidoN);
 
             //q pasa con el jugador?
-            if(j->proteccion == NO)
+            if(protegidoEsteTurno == NO)
             {
                 j->vidas--;
                 j->posActual = *mapa;
@@ -376,7 +439,6 @@ int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, 
             }
             else
             {
-                j->proteccion = NO;
                 printf("\nsobreviviste por la proteccion y te cargaste al bandido!");
             }
 
@@ -402,13 +464,11 @@ char iconoDeLinea(char* linea)
 {
     //devuelvo el char luego de ':' en caravana txt
     char *reg;
-
     reg = strchr(linea, ':');
 
     if(reg == NULL)
-        return ERROR_ARCHIVO;
-
-    return *(reg+1);
+    return ERROR_ARCHIVO;
+    return *(reg+1)=='[' ? *(reg+2) : *(reg+1);
 }
 
 int verificar(tListaCD *m)
@@ -420,11 +480,19 @@ int verificar(tListaCD *m)
     while(sacarPrimeroListaCD(m, &terreno, sizeof(terreno)) == EXITO)
     {
         i++;
+        //considero agregar alguna cantidad como en bandidos
+        if(terreno.vidas)
+                printf("\n[%d] icon: V", i ); //terreno.tempTemporal);
 
-        printf("\n[%d] icon: %c",
-               i,
-               terreno.icon);
-               //terreno.tempTemporal);
+        if(terreno.puntos)
+                printf("\n[%d] icon: P", i);
+
+        if(terreno.oasis)
+                printf("\n[%d] icon: O", i);
+
+        if(terreno.tormenta)
+                printf("\n[%d] icon: T", i);
+
 
         if(terreno.bandidos)
             printf("BANDIDO -> cant: %d\n", terreno.bandidos);
@@ -451,31 +519,67 @@ void cargarMovJugador(tMovimiento *mov, tJugador *jugador)
         printf("En el dado salio el numero: %d\n", numDado);
 
         //Aca se deberia verificar que la posicion del jugador le permita ir atras
-        //if(PosicionJugador <= numDado)
-        puts("Desea Avanzar o retrodecer?(A/R)");
-
-        do
+        if(posicionJugador(jugador) >= numDado)
         {
-            scanf(" %c", &direccion);
-            fflush(stdin);
-        }while(direccion != 'A' && direccion != 'R');
+            puts("Desea Avanzar o retrodecer?(A/R)");
+
+            do
+            {
+                scanf(" %c", &direccion);
+                direccion&=0xDF; //pasar a mayus
+                if(direccion != 'A' && direccion != 'R')
+                    puts("NO ES UNA OPCION VALIDA, REINGRESE");
+
+                fflush(stdin);
+            }while(direccion != 'A' && direccion != 'R');
+
+        }
 
         for(int i = 0; i < numDado; i++)
         {
-        if(direccion == 'A')
-            posDestino = posDestino->sig;
-        else
+            tTerreno* terrenoActual = (tTerreno*)posDestino->info;
+
+            if(direccion == 'A')
+            {
+                if(terrenoActual->salida)
+                {
+                    direccion = 'R';
+                    posDestino = posDestino->ant;
+                }
+                else
+                {
+                    posDestino = posDestino->sig;
+                }
+            }
+            else
+            {
             posDestino = posDestino->ant;
+            }
         }
 
-        //guardamos la posicion destino
         mov->destino = posDestino;
         mov->pasos = numDado;
         mov->direccion = direccion;
     }
-
 }
 
+int posicionJugador(tJugador* j)
+{
+    int i = 0;
+
+    tNodo* pos = j->posActual;   // rompe encapsulamiento esto?
+
+    tTerreno* terreno = (tTerreno*)pos->info;
+
+    while(terreno->inicio == 0)
+    {
+        pos = pos->ant;
+        terreno = (tTerreno*)pos->info;
+        i++;
+    }
+
+    return i;
+}
 void cargarMovBandido(tMovimiento *mov, tBandido *bandido, unsigned turnoAc)
 {
     IABandidos(mov, bandido, turnoAc);
