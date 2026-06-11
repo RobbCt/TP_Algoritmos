@@ -35,14 +35,34 @@ typedef struct
     char direccion;
 }tMovimiento;
 
+
+
 typedef struct
 {
-    char icon;
-    //int tempTemporal; //para algoritmo de bandidos (caliente, frio)
+    unsigned inicio;
+    unsigned puntos;
+    unsigned vidas;
+    unsigned oasis;
+    unsigned tormenta;
+    unsigned salida;
+
     unsigned TurnoActualizado;
     unsigned bandidos;
     unsigned jugador;
 }tTerreno;
+
+
+
+
+
+//typedef struct
+//{
+//    char icon;
+//    //int tempTemporal; //para algoritmo de bandidos (caliente, frio)
+//    unsigned TurnoActualizado;
+//    unsigned bandidos;
+//    unsigned jugador;
+//}tTerreno;
 
 
 

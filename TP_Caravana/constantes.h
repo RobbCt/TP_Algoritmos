@@ -2,15 +2,15 @@
 #define CONSTANTES_H_INCLUDED
 
 //valores de retorno
-#define TODO_OK          0
-#define ERROR_ARCHIVO    1
-#define ERROR_TABLERO    2
-#define ERROR_PARTIDA    3
-#define ERROR_CONFIG     4
-#define SIN_MEMO         5
-#define SIN_JUGADOR      6
+#define TODO_OK           0
+#define ERROR_ARCHIVO     1
+#define ERROR_TABLERO     2
+#define ERROR_PARTIDA     3
+#define ERROR_CONFIG      4
+#define SIN_MEMO          5
+#define SIN_JUGADOR       6
 #define JUGADOR_EXISTENTE 7
-#define DUPLICADO        8
+#define DUPLICADO         8
 
 //tamaños def
 #define TAMLINEA        100

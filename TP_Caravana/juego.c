@@ -80,7 +80,6 @@ int iniciarPartida(tTablero *tablero,FILE* archPartidas,int idJugador)
 
     vaciarListaCD(&mapa);
     vaciarLista(&bandidosGlobales);
-    //y free para todos los bandidos secuencialmente
 
     return jugador.vidas ? SI : NO;
 }

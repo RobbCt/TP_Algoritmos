@@ -56,56 +56,62 @@
 
 1778259772 c:\users\rober\desktop\tp-algo\tp_caravana\tipos.h
 
-1781020198 c:\users\rober\desktop\tp-algo\tp_caravana\constantes.h
+1781148412 c:\users\rober\desktop\tp-algo\tp_caravana\constantes.h
 
-1781030886 source:c:\users\rober\desktop\tp-algo\tp_caravana\juego.c
+1781144167 source:c:\users\rober\desktop\tp-algo\tp_caravana\juego.c
 	"juego.h"
 	"GRAFICOS/logica.h"
 	"GRAFICOS/render.h"
 	"funciones_ListaCircDoble.h"
 	"funciones_listaDinamica.h"
 
-1781030725 c:\users\rober\desktop\tp-algo\tp_caravana\juego.h
+1781144167 c:\users\rober\desktop\tp-algo\tp_caravana\juego.h
 	<stdio.h>
 	<stdlib.h>
 	<time.h>
+	<conio.h>
 	"tipos.h"
 	"tablero.h"
 	"constantes.h"
+	"ranking.h"
+	"arbolBB.h"
+	"gestionDatos.h"
 
 1779157848 c:\users\rober\desktop\tp-algo\tp_caravana\tablero.h
 	"tipos.h"
 	"constantes.h"
 	"config.h"
 
-1779157848 source:c:\users\rober\desktop\tp-algo\tp_caravana\tablero.c
+1781143818 source:c:\users\rober\desktop\tp-algo\tp_caravana\tablero.c
 	"tablero.h"
 
-1779157848 source:c:\users\rober\desktop\tp-algo\tp_caravana\main.c
+1781143818 source:c:\users\rober\desktop\tp-algo\tp_caravana\main.c
 	"juego.h"
+	"arbolBB.h"
+	"gestionDatos.h"
 
-1781030910 source:c:\users\rober\desktop\tp-algo\tp_caravana\funciones_listadinamica.c
+1781143818 source:c:\users\rober\desktop\tp-algo\tp_caravana\funciones_listadinamica.c
 	"funciones_listaDinamica.h"
 	<stdio.h>
 
-1781027151 c:\users\rober\desktop\tp-algo\tp_caravana\funciones_listadinamica.h
+1781143818 c:\users\rober\desktop\tp-algo\tp_caravana\funciones_listadinamica.h
 	<stdlib.h>
 	<string.h>
 
-1780371868 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\render.c
+1781152193 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\render.c
 	"render.h"
 	"logica.h"
 
-1780367736 c:\users\rober\desktop\tp-algo\tp_caravana\graficos\render.h
+1781143818 c:\users\rober\desktop\tp-algo\tp_caravana\graficos\render.h
 	<stdio.h>
 	<string.h>
 	"../funciones_ListaCircDoble.h"
 	"../constantes.h"
 
-1781030690 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.c
+1781149861 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.c
 	"logica.h"
 
-1781030690 c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.h
+1781147459 c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.h
 	<stdio.h>
 	<ctype.h>
 	<windows.h>
@@ -121,10 +127,10 @@
 	<stdlib.h>
 	<string.h>
 
-1780166320 source:c:\users\rober\desktop\tp-algo\tp_caravana\funciones_coladinamica.c
+1781143818 source:c:\users\rober\desktop\tp-algo\tp_caravana\funciones_coladinamica.c
 	"funciones_colaDinamica.h"
 
-1780166596 c:\users\rober\desktop\tp-algo\tp_caravana\funciones_coladinamica.h
+1781143818 c:\users\rober\desktop\tp-algo\tp_caravana\funciones_coladinamica.h
 	<stdlib.h>
 	<string.h>
 
@@ -287,4 +293,38 @@
 1781035671 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_coladinamica.h
 	<stdlib.h>
 	<string.h>
+
+1781143818 source:c:\users\rober\desktop\tp-algo\tp_caravana\arbolbb.c
+	"arbolBB.h"
+
+1781143818 c:\users\rober\desktop\tp-algo\tp_caravana\arbolbb.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"config.h"
+
+1781143818 source:c:\users\rober\desktop\tp-algo\tp_caravana\gestiondatos.c
+	"gestionDatos.h"
+
+1781143818 c:\users\rober\desktop\tp-algo\tp_caravana\gestiondatos.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	"arbolBB.h"
+	"constantes.h"
+
+1781143818 c:\users\rober\desktop\tp-algo\tp_caravana\ranking.h
+	"config.h"
+	"gestionDatos.h"
+	"TDAvector.h"
+
+1781143818 c:\users\rober\desktop\tp-algo\tp_caravana\tdavector.h
+	"config.h"
+
+1781143818 source:c:\users\rober\desktop\tp-algo\tp_caravana\ranking.c
+	"ranking.h"
+
+1781143818 source:c:\users\rober\desktop\tp-algo\tp_caravana\tdavector.c
+	"TDAvector.h"
 

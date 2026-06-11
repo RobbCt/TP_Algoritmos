@@ -14,8 +14,8 @@
 #include "gestionDatos.h"
 
 void mostrarReglas();
-int nuevaPartida(const char* nombreJugador, tArbolBinBusq*arbolIndices,
-                 FILE*archJugadores,FILE*archPartidas);
-int iniciarPartida(tTablero *tablero, FILE*,int);
+int nuevaPartida(const char* nombreJugador, tArbolBinBusq *arbolIndices,
+                 FILE *archJugadores,FILE *archPartidas);
+int iniciarPartida(tTablero *tablero, FILE *archPartidas,int idJugador);
 
 #endif // JUEGO_H_INCLUDED
