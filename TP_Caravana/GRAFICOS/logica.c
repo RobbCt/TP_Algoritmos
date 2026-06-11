@@ -462,72 +462,58 @@ char iconoDeLinea(char* linea)
 
 void cargarMovJugador(tMovimiento *mov, tJugador *jugador)
 {
+    tNodo *posDestino;
+    unsigned numDado;
+    char direccion;
+    int puedeRetroceder;
 
-    if(jugador->turno=='Y')
+    if(jugador->turno != SI)
+        return;
+
+    posDestino = jugador->posActual;
+    numDado = tirarDado();
+
+    printf("En el dado salio el numero: %u\n", numDado);
+
+    puedeRetroceder = posicionJugador(jugador) >= numDado;
+
+    puts("Desea Avanzar o Retroceder? (A/R)");
+
+    do
     {
-       tNodo *posDestino = jugador->posActual;
-        unsigned numDado = tirarDado();
-        char direccion = 'A';
+        scanf(" %c", &direccion);
+        direccion = toupper(direccion);
 
-        printf("En el dado salio el numero: %d\n", numDado);
+        //busco q la segunda sentencia del AND sea verdadera su no puede retroceder (solo avance)
+        if(direccion != 'A' && !(puedeRetroceder && direccion == 'R'))
+            puts("NO ES UNA OPCION VALIDA, REINGRESE");
 
-        //Aca se deberia verificar que la posicion del jugador le permita ir atras
-        if(posicionJugador(jugador) >= numDado)
-        {
-            puts("Desea Avanzar o retrodecer?(A/R)");
+    }while(direccion != 'A' && !(puedeRetroceder && direccion == 'R'));
 
-            do
-            {
-                scanf(" %c", &direccion);
-                direccion = toupper(direccion); //pasar a mayus
-                if(direccion != 'A' && direccion != 'R')
-                    puts("NO ES UNA OPCION VALIDA, REINGRESE");
 
-                fflush(stdin);
-            }while(direccion != 'A' && direccion != 'R');
-
-        }
-        else
-        {
-            puts("Desea Avanzar o retrodecer?(A/R)");
-
-            do
-            {
-                scanf(" %c", &direccion);
-                direccion = toupper(direccion); //pasar a mayus
-                if(direccion != 'A')
-                    puts("NO ES UNA OPCION VALIDA, REINGRESE");
-
-                fflush(stdin);
-            }while(direccion != 'A');
-        }
-
+    if(direccion == 'R')
+    {
+        for(int i = 0; i < numDado; i++)
+            posDestino = posDestino->ant;
+    }
+    else
+    {
         for(int i = 0; i < numDado; i++)
         {
-            tTerreno* terrenoActual = (tTerreno*)posDestino->info;
-
-            if(direccion == 'A')
+            if(((tTerreno*)posDestino->info)->salida)
             {
-                if(terrenoActual->salida)
-                {
-                    direccion = 'R';
-                    posDestino = posDestino->ant;
-                }
-                else
-                {
-                    posDestino = posDestino->sig;
-                }
+                direccion = 'R';
+                posDestino = posDestino->ant;
             }
             else
-            {
-            posDestino = posDestino->ant;
-            }
-        }
+                posDestino = posDestino->sig;
 
-        mov->destino = posDestino;
-        mov->pasos = numDado;
-        mov->direccion = direccion;
+        }
     }
+
+    mov->destino = posDestino;
+    mov->pasos = numDado;
+    mov->direccion = direccion;
 }
 
 int posicionJugador(tJugador* j)
