@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1781037604 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\main.c
+1781187896 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\main.c
 	"juego.h"
 	"arbolBB.h"
 	"gestionDatos.h"
@@ -16,19 +16,20 @@
 
 1778450313 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\tipos.h
 
-1781036155 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\constantes.h
+1781187895 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\constantes.h
 
-1781037497 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\juego.c
+1781187896 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\juego.c
 	"juego.h"
 	"GRAFICOS/logica.h"
 	"GRAFICOS/render.h"
 	"funciones_ListaCircDoble.h"
 	"funciones_listaDinamica.h"
 
-1781036675 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\juego.h
+1781187896 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\juego.h
 	<stdio.h>
 	<stdlib.h>
 	<time.h>
+	<conio.h>
 	"tipos.h"
 	"tablero.h"
 	"constantes.h"
@@ -217,18 +218,18 @@
 	<stdlib.h>
 	<string.h>
 
-1781035708 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_listadinamica.c
+1781187895 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_listadinamica.c
 	"funciones_listaDinamica.h"
 	<stdio.h>
 
-1781035708 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_listadinamica.h
+1781187896 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_listadinamica.h
 	<stdlib.h>
 	<string.h>
 
-1781035708 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\graficos\logica.c
+1781195498 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\graficos\logica.c
 	"logica.h"
 
-1781036155 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\graficos\logica.h
+1781187894 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\graficos\logica.h
 	<stdio.h>
 	<ctype.h>
 	<windows.h>
@@ -237,11 +238,11 @@
 	"../funciones_ListaCircDoble.h"
 	"../funciones_listaDinamica.h"
 
-1781035671 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\graficos\render.c
+1781195829 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\graficos\render.c
 	"render.h"
 	"logica.h"
 
-1781035671 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\graficos\render.h
+1781187895 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\graficos\render.h
 	<stdio.h>
 	<string.h>
 	"../funciones_ListaCircDoble.h"
@@ -287,10 +288,10 @@
 	"gestionDatos.h"
 	"arbolBB.h"
 
-1781035671 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_coladinamica.c
+1781187895 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_coladinamica.c
 	"funciones_colaDinamica.h"
 
-1781035671 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_coladinamica.h
+1781187895 c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_coladinamica.h
 	<stdlib.h>
 	<string.h>
 

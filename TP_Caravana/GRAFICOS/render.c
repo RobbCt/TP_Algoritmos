@@ -1,7 +1,7 @@
 #include "render.h"
 #include "logica.h"
 
-#define COLUMNAS_MAPA      16
+#define COLUMNAS_MAPA      15
 #define ANCHO_CASILLA      9
 #define ALTO_CASILLA       7
 #define MAX_TEXTO_CASILLA  (ANCHO_CASILLA + 1)

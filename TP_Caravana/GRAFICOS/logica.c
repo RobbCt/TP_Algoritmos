@@ -103,20 +103,20 @@ int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlo
 
             //pongo ++ para casos donde items>casillas
             if(icon == 'P')
-                terreno.puntos = 1;
+                terreno.puntos += 1;
 
             if(icon == 'V')
-                terreno.vidas = 1;
+                terreno.vidas += 1;
 
             if(icon == 'O')
-                terreno.oasis = 1;
+                terreno.oasis += 1;
 
             if(icon == 'T')
-                terreno.tormenta = 1;
+                terreno.tormenta += 1;
 
             if(icon == 'S')
             {
-                terreno.salida = 1; //solo puede haber una salida
+                terreno.salida += 1; //solo puede haber una salida
                 terreno.bandidos = contarBandidosEnCasilla(linea);
             }
 
@@ -172,13 +172,13 @@ void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigne
     if(jugador->turno == SI)
     {
         cargarMovJugador(&mov, jugador);
-        Sleep(5000);
+//        Sleep(5000);
         ponerEnCola(&colaMovimientos, &mov, sizeof(mov));
     }
     else
     {
         puts("Turno perdido por tormenta");
-        Sleep(5000);
+//        Sleep(5000);
     }
 
     ///calculo el movimiendo de cada bandido
@@ -491,25 +491,27 @@ void cargarMovJugador(tMovimiento *mov, tJugador *jugador)
     }while(direccion != 'A' && !(puedeRetroceder && direccion == 'R'));
 
 
-    if(direccion == 'R')
-    {
-        for(int i = 0; i < numDado; i++)
-            posDestino = posDestino->ant;
-    }
-    else
-    {
-        for(int i = 0; i < numDado; i++)
+    for(int i = 0; i < numDado; i++)
         {
-            if(((tTerreno*)posDestino->info)->salida)
+            tTerreno* terrenoActual = (tTerreno*)posDestino->info;
+
+            if(direccion == 'A')
             {
-                direccion = 'R';
-                posDestino = posDestino->ant;
+                if(terrenoActual->salida)
+                {
+                    direccion = 'R';
+                    posDestino = posDestino->ant;
+                }
+                else
+                {
+                    posDestino = posDestino->sig;
+                }
             }
             else
-                posDestino = posDestino->sig;
-
+            {
+            posDestino = posDestino->ant;
+            }
         }
-    }
 
     mov->destino = posDestino;
     mov->pasos = numDado;
