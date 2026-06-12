@@ -68,7 +68,7 @@ typedef struct
 
 int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlobales);
 
-void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigned turno);
+void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigned turno, tLista* listaMovimientos);
 
 void IABandidos(tMovimiento *mov, tBandido *bandido, unsigned turnoAc);
 

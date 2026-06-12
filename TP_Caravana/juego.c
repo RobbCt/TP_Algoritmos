@@ -41,13 +41,14 @@ int iniciarPartida(tTablero *tablero,FILE* archPartidas,int idJugador)
     tJugador jugador;
     tListaCD mapa;
     tLista bandidosGlobales;
+    tLista movimientos;
     tPartida registroPartida;
     unsigned turno = 0;
 
     crearListaCD(&mapa);
 
     crearLista(&bandidosGlobales);
-
+    crearLista(&movimientos);
     ///cargo la listaCD y todos los bandidos
     cargarMapa(&mapa, &jugador, tablero->vidasInicio, &bandidosGlobales);
 
@@ -56,7 +57,7 @@ int iniciarPartida(tTablero *tablero,FILE* archPartidas,int idJugador)
     {
         renderizarPantalla(&mapa, jugador.vidas, jugador.proteccion, jugador.puntos, jugador.turno, turno);
 
-        procesarTurno(&mapa, &jugador, &bandidosGlobales, turno);
+        procesarTurno(&mapa, &jugador, &bandidosGlobales, turno, &movimientos);
 
         turno++;
     }
@@ -75,15 +76,36 @@ int iniciarPartida(tTablero *tablero,FILE* archPartidas,int idJugador)
     //forzamo buffer da
     fflush(archPartidas);
 
+    printf("\n=========================================");
+    printf("\n MOVIMIENTOS REALIZADOS ");
+    printf("\n=========================================\n");
+    mostrarMovimientos(&movimientos);
+
     printf("\npartida guardada para el jugador con id %d.\n", idJugador);
 
 
     vaciarListaCD(&mapa);
     vaciarLista(&bandidosGlobales);
+    vaciarLista(&movimientos);
 
     return jugador.vidas ? SI : NO;
 }
 
+void mostrarMovimientos(tLista* movimientos)
+{
+    tIteradorLista it;
+    tMovimiento* mov;
+
+    mov= obtenerPrimeroInfo(movimientos, &it);
+
+    while(mov)
+    {
+        printf("%c%u  ", mov->direccion=='A' ? 'F' : 'B', mov->pasos);
+
+        mov= obtenerSiguienteInfo(&it);
+    }
+    putchar('\n');
+}
 void mostrarReglas()
 {
     puts("=========================================================");
