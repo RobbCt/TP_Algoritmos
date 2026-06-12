@@ -160,7 +160,7 @@ int contarBandidosEnCasilla(char* linea)
     return cant;
 }
 
-void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigned turno) //considerando hacerlo int y usar macros para diferentes panoramas
+void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigned turno, tLista* listaMovimientos) //considerando hacerlo int y usar macros para diferentes panoramas
 {
 
     tMovimiento mov;
@@ -172,6 +172,7 @@ void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigne
     if(jugador->turno == SI)
     {
         cargarMovJugador(&mov, jugador);
+        ponerAlFinal(listaMovimientos,&mov, sizeof(mov));
 //        Sleep(5000);
         ponerEnCola(&colaMovimientos, &mov, sizeof(mov));
     }
@@ -466,6 +467,7 @@ void cargarMovJugador(tMovimiento *mov, tJugador *jugador)
     unsigned numDado;
     char direccion;
     int puedeRetroceder;
+    char direccionRebote;
 
     if(jugador->turno != SI)
         return;
@@ -490,16 +492,17 @@ void cargarMovJugador(tMovimiento *mov, tJugador *jugador)
 
     }while(direccion != 'A' && !(puedeRetroceder && direccion == 'R'));
 
+    direccionRebote = direccion;
 
     for(int i = 0; i < numDado; i++)
         {
             tTerreno* terrenoActual = (tTerreno*)posDestino->info;
 
-            if(direccion == 'A')
+            if(direccionRebote == 'A')
             {
                 if(terrenoActual->salida)
                 {
-                    direccion = 'R';
+                    direccionRebote = 'R';
                     posDestino = posDestino->ant;
                 }
                 else
