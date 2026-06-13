@@ -6,13 +6,17 @@
 #define ALTO_CASILLA       7
 #define MAX_TEXTO_CASILLA  (ANCHO_CASILLA + 1)
 
+//vector de (COLUMNAS_MAPA) elementos, cada elemento es
+//una matriz de (ALTO_CASILLA) × (MAX_TEXTO_CASILLA) chars
+
 void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, char turno, unsigned nTurno)
 {
     tNodo *act, *inicio;
-    //vector de (COLUMNAS_MAPA) elementos, cada elemento es
-    //una matriz de (ALTO_CASILLA) × (MAX_TEXTO_CASILLA) chars
+
     char fila[COLUMNAS_MAPA][ALTO_CASILLA][MAX_TEXTO_CASILLA];
-    int numCol = 0, numFila = 0;
+
+    int numCol = 0;
+    int numFila = 0;
 
     system("cls");
 
@@ -28,66 +32,29 @@ void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, cha
         int cantItems = 0;
         int i;
 
+        if(terreno->icon != ICON_PUNTO)
+            sprintf(items[cantItems++], "%c", terreno->icon);
+
+        /* Jugador */
         if(terreno->jugador)
             sprintf(items[cantItems++], "%c", ICON_JUGADOR);
 
+        /* Bandidos */
         if(terreno->bandidos)
         {
             if(terreno->bandidos == 1)
                 sprintf(items[cantItems++], "%c", ICON_BANDIDO);
             else
                 sprintf(items[cantItems++], "%ux%c",
-                        terreno->bandidos, ICON_BANDIDO);
+                        terreno->bandidos,
+                        ICON_BANDIDO);
         }
 
-        if(terreno->vidas)
-        {
-            if(terreno->vidas == 1)
-                sprintf(items[cantItems++], "%c", ICON_VIDA);
-            else
-                sprintf(items[cantItems++], "%ux%c",
-                        terreno->vidas, ICON_VIDA);
-        }
-
-        if(terreno->puntos)
-        {
-            if(terreno->puntos == 1)
-                sprintf(items[cantItems++], "%c", ICON_PREMIO);
-            else
-                sprintf(items[cantItems++], "%ux%c",
-                        terreno->puntos, ICON_PREMIO);
-        }
-
-        if(terreno->oasis)
-        {
-            if(terreno->oasis == 1)
-                sprintf(items[cantItems++], "%c", ICON_OASIS);
-            else
-                sprintf(items[cantItems++], "%ux%c",
-                        terreno->oasis, ICON_OASIS);
-        }
-
-        if(terreno->tormenta)
-        {
-            if(terreno->tormenta == 1)
-                sprintf(items[cantItems++], "%c", ICON_TORMENTA);
-            else
-                sprintf(items[cantItems++], "%ux%c",
-                        terreno->tormenta, ICON_TORMENTA);
-        }
-
-        if(terreno->inicio)
-            sprintf(items[cantItems++], "%c", ICON_INICIO);
-
-        if(terreno->salida)
-            sprintf(items[cantItems++], "%c", ICON_SALIDA);
-
-        if(cantItems == 0)
-            sprintf(items[cantItems++], "%c", ICON_PUNTO);
-
+        /* Limpiar casilla */
         for(i = 0; i < ALTO_CASILLA; i++)
             fila[numCol][i][0] = '\0';
 
+        /* Centrado vertical */
         {
             int inicioVertical = (ALTO_CASILLA - cantItems) / 2;
 

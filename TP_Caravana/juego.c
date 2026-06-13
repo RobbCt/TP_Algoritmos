@@ -53,7 +53,7 @@ int iniciarPartida(tTablero *tablero,FILE* archPartidas,int idJugador)
     cargarMapa(&mapa, &jugador, tablero->vidasInicio, &bandidosGlobales);
 
 
-    while(jugador.vidas != 0 && ((tTerreno*)jugador.posActual->info)->salida == 0)
+    while(jugador.vidas != 0 && ((tTerreno*)jugador.posActual->info)->icon != ICON_SALIDA)
     {
         renderizarPantalla(&mapa, jugador.vidas, jugador.proteccion, jugador.puntos, jugador.turno, turno);
 
@@ -106,6 +106,7 @@ void mostrarMovimientos(tLista* movimientos)
     }
     putchar('\n');
 }
+
 void mostrarReglas()
 {
     puts("=========================================================");
