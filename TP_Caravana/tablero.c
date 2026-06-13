@@ -4,7 +4,7 @@
 int generarTablero(tTablero *tab, char *nArch)
 {
     FILE* pf=fopen(nArch, "wt");
-    int totalEventos, casillasJugables, bandEnSalida=0;
+    int totalEventos, casillasJugables, bandEnSalida=0, eventosNoBand;
 
     ///bajamos define's a vector
     char icons[]= {
@@ -31,14 +31,21 @@ int generarTablero(tTablero *tab, char *nArch)
     {
         if(rand()%2) //xx
         {
-            bandEnSalida = rand() % tab->cantBand + 1;
+            bandEnSalida = rand() % tab->cantBand;
             tab->cantBand -= bandEnSalida;
         }
     }
 
     ///validamos si es jugable el tablero
-    totalEventos=tab->cantBand +tab->cantPrem +tab->cantPlusV +tab->cantOasis +tab->cantTorm;
-    casillasJugables= tab->cantPos-2;
+    eventosNoBand = tab->cantPrem+ tab->cantPlusV +tab->cantOasis +tab->cantTorm;
+    totalEventos=tab->cantBand +eventosNoBand;
+    casillasJugables= tab->cantPos -2;
+
+    if(eventosNoBand > casillasJugables)
+    {
+        fclose(pf);
+        return ERROR_TABLERO;
+    }
 
     ///de ser jugable 01:[I J]...
     fprintf(pf, "%02d:[%c %c]\n", 1, icons[7], icons[0]);//seteamos jugador al inicio-> 01:[I J]
@@ -49,9 +56,9 @@ int generarTablero(tTablero *tab, char *nArch)
         generarPorZonas(pf,tab,icons);
     else
         generarPorPaquetes(pf,tab,icons);
-    //si hay más eventos que casillas, se generan paquetes [BB, VT, BP, etc] - prox validar combos posible¿
+    //si hay más eventos que casillas, se generan paquetes empezando por el evento seguido del band
 
-    //seteamos salida al final
+    //seteamos salida al final con la cant de bands calculadas aleatoriamente
     if(bandEnSalida==0)
         fprintf(pf, "%02d:%c\n", tab->cantPos, icons[8]);
     else
@@ -155,47 +162,91 @@ void generarPorPaquetes(FILE* pf, tTablero* tab, char icons[])
 
     for(pos = 2; pos < tab->cantPos; pos++)
     {
-        int eventosRestantes =tab->cantBand +tab->cantPrem +tab->cantPlusV +tab->cantOasis +tab->cantTorm;
         int casillasRestantes = tab->cantPos - pos;
+        int eventosNoBandRestantes=tab->cantPrem +tab->cantPlusV +tab->cantOasis +tab->cantTorm;
+        int eventosRestantes =tab->cantBand +eventosNoBandRestantes;
 
         int cantEventosEnCasilla, resto, i;
 
+        //si ya no quedaran eventos, dejamos un punto
         if(eventosRestantes <= 0)
             fprintf(pf, "%02d:%c\n", pos, icons[CASILLERO_PUNTO]);
         else
         {
-            //cant min de eventos q se debe poner en esta casilla para q entren todos antes de la salida
-            cantEventosEnCasilla = eventosRestantes / casillasRestantes;
-            resto = eventosRestantes % casillasRestantes;
-
-            //resto de eventos q no entran en la div excta
-            //a veces agrega uno extra para repartir el resto¿
-            if(resto > 0 && rand() % casillasRestantes < resto)
-                cantEventosEnCasilla++;
-
-            fprintf(pf, "%02d:", pos);
-
-            //solo si hay mas de un evento ponemos nuestros corchetes
-            if(cantEventosEnCasilla > 1)
-                fprintf(pf, "[");
-
-            for(i = 0; i < cantEventosEnCasilla; i++)
+            //si las casillas son exactamente igual a la cant de eventos
+            //ponemos de a uno en cada casilla para evitar el solape
+            if(casillasRestantes==eventosNoBandRestantes)///caso especial
             {
-                int evento = selecEvento(tab);
+                //obligamos un item noB y reparto bands
+                cantEventosEnCasilla=1+ (tab->cantBand /casillasRestantes);
 
-                if(evento != -1)
-                    fprintf(pf, "%c", icons[evento]);
+                //lo sobrante se distribuye de forma aleatoria
+                int restB=tab->cantBand %casillasRestantes;
+                if(restB>0 && rand()%casillasRestantes <restB)
+                    cantEventosEnCasilla++;
+            }
+            else///reparto normal
+            {
+                //cant min de eventos q se debe poner en esta casilla para q entren todos antes de la salida
+                cantEventosEnCasilla = eventosRestantes / casillasRestantes;
+                resto = eventosRestantes % casillasRestantes;
+
+                //resto de eventos q no entran en la div excta
+                //a veces agrega uno extra para repartir el resto¿
+                if(resto > 0 && rand() % casillasRestantes < resto)
+                    cantEventosEnCasilla++;
             }
 
-            if(cantEventosEnCasilla > 1)
-                fprintf(pf, "]");
+            int totalParaImprimir= cantEventosEnCasilla;//total original planificado pa los []
+            int itemNoB= -1; //-1-> q no se selecciono evento especial
 
-            fprintf(pf, "\n");
+            //decide si la casilla recibe un item noB
+            if(eventosNoBandRestantes > 0 &&
+              ((casillasRestantes == eventosNoBandRestantes) ||
+               (rand() % casillasRestantes < eventosNoBandRestantes)))
+                itemNoB= selecEventoNoBandido(tab);
+
+            //el resto de lugares va para los bands
+            //si sacamos un item noB los bands ocuparan el espacio restante (cantEventos-1)
+            int cantBandidos= cantEventosEnCasilla- (itemNoB!=-1? 1:0);
+
+            //evitan q se asignen mas bands de los q queden
+            if(cantBandidos > tab->cantBand)
+                cantBandidos=tab->cantBand;
+
+            if(cantBandidos< 0)
+                cantBandidos= 0;
+
+            tab->cantBand-= cantBandidos;
+
+            //grabamos el .txt
+            fprintf(pf, "%02d:", pos);
+
+            //si a final quedo vacia va un puntito
+            if(cantBandidos == 0 && itemNoB == -1)
+                fprintf(pf, "%c\n", icons[CASILLERO_PUNTO]);
+            else
+            {
+                //total original calculado para saber si abrimos []
+                if(totalParaImprimir > 1)
+                    fprintf(pf, "[");
+
+                //el item noB se imprime siempre primero si existe..
+                if(itemNoB!=-1)
+                    fprintf(pf, "%c", icons[itemNoB]);
+
+                //luego van los bands si es q estan
+                for(i=0;i<cantBandidos;i++)
+                    fprintf(pf, "%c", icons[CASILLERO_BANDIDO]);
+
+                if(totalParaImprimir>1)
+                    fprintf(pf, "]");
+
+                fprintf(pf, "\n");
+            }
         }
     }
 }
-
-
 
 void calcularRangoZona(int zona, int cantPos, int cantZonas, int* inicio, int* fin)
 {
@@ -251,7 +302,6 @@ int selecEvento(tTablero* tab)
     if(total <= 0)
         return -1;
 
-
     //se toma las cantidades restantes de cada evento
     //ej, si quedan mas bandidos qpremios, hay mas probabilidad de q salga un bandido¿
 
@@ -282,6 +332,39 @@ int selecEvento(tTablero* tab)
     random -= tab->cantPlusV;
 
     if(random < tab->cantOasis)
+    {
+        tab->cantOasis--;
+        return CASILLERO_OASIS;
+    }
+
+    tab->cantTorm--;
+    return CASILLERO_TORMENTA;
+}
+
+int selecEventoNoBandido(tTablero* tab)
+{
+    int totalNoBand = tab->cantPrem + tab->cantPlusV + tab->cantOasis + tab->cantTorm;
+
+    if (totalNoBand <= 0)
+        return -1;
+
+    int random = rand() % totalNoBand;
+
+    if (random < tab->cantPrem)
+    {
+        tab->cantPrem--;
+        return CASILLERO_PREMIO;
+    }
+
+    random -= tab->cantPrem;
+    if (random < tab->cantPlusV)
+    {
+        tab->cantPlusV--;
+        return CASILLERO_VIDA;
+    }
+
+    random -= tab->cantPlusV;
+    if (random < tab->cantOasis)
     {
         tab->cantOasis--;
         return CASILLERO_OASIS;

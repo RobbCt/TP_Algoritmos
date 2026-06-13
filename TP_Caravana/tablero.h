@@ -14,6 +14,6 @@ void generarPorPaquetes(FILE* pf, tTablero* tab, char icons[]);
 void calcularRangoZona(int zona, int cantPos, int cantZonas, int* inicio, int* fin);
 int obtenerZonaDePos(int pos, int cantPos, int cantZonas);
 int selecEvento(tTablero* tab);
-
+int selecEventoNoBandido(tTablero* tab);
 
 #endif // TABLERO_H_INCLUDED
