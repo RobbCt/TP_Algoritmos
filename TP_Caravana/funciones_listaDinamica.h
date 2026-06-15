@@ -4,11 +4,11 @@
 #include <stdlib.h> //malloc
 #include <string.h> //memcpy
 
-#define EXITO 0
-#define SIN_MEM 1
-#define LISTA_VACIA 2
-#define LISTA_DISPONIBLE 3
-#define NO_ENCONTRADO 3
+#define L_EXITO 0
+#define L_SIN_MEM 1
+#define L_VACIA 2
+#define L_DISPONIBLE 3
+#define L_NO_ENCONTRADO 3
 
 #define MIN(X, Y) ((X) <= (Y) ? (X) : (Y))
 
@@ -37,26 +37,32 @@ int listaLlena(const tLista *p, unsigned cantBytes);
 
 void vaciarLista(tLista *p);
 
-int ponerAlComienzo(tLista *p,const void *d, unsigned tamBytes);
+int ponerAlComienzoLista(tLista *p,const void *d, unsigned tamBytes);
 
 int sacarPrimeroLista(tLista *p, void *d, unsigned tamBytes);
 
 int verPrimeroLista(const tLista *p, void *d, unsigned tamBytes);
 
-int ponerAlFinal(tLista *p, const void *d, unsigned tamBytes);
+int ponerAlFinalLista(tLista *p, const void *d, unsigned tamBytes);
 
 int sacarUltimoLista(tLista *p, void *d, unsigned tamBytes);
 
 int verUltimoLista(const tLista *p, void *d, unsigned tamBytes);
 
-void* obtenerPrimeroInfo(tLista *p, tIteradorLista *it);
+///ITERADOR
 
-void* obtenerSiguienteInfo(tIteradorLista *it);
+int iniciarPrimeroItLista(tIteradorLista *it, const tLista *p);
 
-tNodoL* obtenerPrimerNodo(tLista *p, tIteradorLista *it);
+int verActualItLista(tIteradorLista *it, void *d, unsigned tamBytes);
 
-tNodoL* obtenerSiguienteNodo(tIteradorLista *it);
+int avanzarItLista(tIteradorLista *it);
 
-int elimDirDeLista(tLista *p, const void *d);
+int modificarActualItLista(tIteradorLista *it, const void *d, unsigned tamBytes);
+
+int eliminarActualItLista(tIteradorLista *it, tLista *p);
+
+int esValidoItLista(const tIteradorLista *it);
+
+void reiniciarItLista(tIteradorLista *it);
 
 #endif // FUNCIONES_LISTADINAMICA_H_INCLUDED

@@ -4,6 +4,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define C_EXITO 0
+#define C_SIN_MEM 1
+#define C_VACIA 2
+#define C_DISPONIBLE 3
+
+#define MIN(X, Y) ((X) <= (Y) ? (X) : (Y))
+
 typedef struct sNodoC
 {
     void *info;

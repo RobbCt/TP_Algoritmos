@@ -1,7 +1,5 @@
 #include "funciones_colaDinamica.h"
 
-#define MIN(X,Y) X > Y ? Y : X
-
 void crearCola(tCola *p)
 {
     p->pri = NULL;
@@ -11,7 +9,7 @@ void crearCola(tCola *p)
 int colaVacia(const tCola *p)
 {
     //literal del lado izq
-    return NULL == p->pri;
+    return p->pri == NULL ? C_VACIA : C_DISPONIBLE;
 }
 
 int colaLlena(const tCola *p, unsigned tamInfo)
@@ -23,9 +21,7 @@ int colaLlena(const tCola *p, unsigned tamInfo)
     free(nue);
     free(info);
 
-    return nue == NULL || info == NULL;
-
-    //en la version dinamica, q retorne true para mantener compatibilidad con la version estatica
+    return (nue == NULL || info == NULL) ? C_SIN_MEM : C_DISPONIBLE;
 }
 
 int ponerEnCola(tCola *p, const void *d, unsigned tamInfo)
@@ -38,7 +34,7 @@ int ponerEnCola(tCola *p, const void *d, unsigned tamInfo)
     if(nue == NULL || (nue->info = malloc(tamInfo)) == NULL)
     {
         free(nue);
-        return 0;
+        return C_SIN_MEM;
     }//si el if es false, nue y info tienen dir validas
 
     memcpy(nue->info, d, tamInfo);
@@ -52,7 +48,7 @@ int ponerEnCola(tCola *p, const void *d, unsigned tamInfo)
 
     p->ult = nue; //siempre q agregemos un nodo, ese sera tmb el ultimo
 
-    return 1;
+    return C_EXITO;
 }
 
 int sacarDeCola(tCola *p, void *d, unsigned tamInfo)
@@ -61,7 +57,7 @@ int sacarDeCola(tCola *p, void *d, unsigned tamInfo)
     tNodoC *sale = p->pri;
 
     if(sale == NULL) //ver si hay nodos q sacar
-        return 0;
+        return C_VACIA;
 
     memcpy(d, sale->info, MIN(tamInfo, sale->tamInfo)); //desde sale copiamos el primero
     p->pri = sale->sig; //el siguiente al nodo copiado es primero
@@ -72,15 +68,17 @@ int sacarDeCola(tCola *p, void *d, unsigned tamInfo)
     if(p->pri == NULL)//if opcional
         p->ult = NULL;//si el primero es nadie (se acabo la cola) tampoco hay ultimo
 
-    return 1;
+    return C_EXITO;
 }
 
 int verPrimeroCola(const tCola *p, void *d, unsigned tamInfo)
 {
     if(p->pri == NULL)
-        return 0;
+        return C_VACIA;
+
     memcpy(d, p->pri->info, MIN(tamInfo,p->pri->tamInfo));
-    return 1;
+
+    return C_EXITO;
 }
 
 void vaciarCola(tCola *p)

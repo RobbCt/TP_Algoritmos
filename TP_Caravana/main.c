@@ -16,6 +16,7 @@ int main()
 
     if(abrirArchivo(&archJugadores, JUGADORES_ARCH, "a+b") != TODO_OK)
         return ERROR_ARCHIVO;
+
     if(abrirArchivo(&archPartidas, PARTIDAS_ARCH, "a+b") != TODO_OK)
     {
         fclose(archJugadores);

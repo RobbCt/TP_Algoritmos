@@ -7,52 +7,51 @@
 
 
 
-int nuevaPartida(const char* nombreJugador, tArbolBinBusq*arbolIndices, FILE*archJugadores, FILE*archPartidas)
+int nuevaPartida(const char* nombreJugador, tArbolBinBusq *arbolIndices, FILE *archJugadores, FILE *archPartidas)
 {
     tTablero tablero;
 
     tJugadorIndice datosJugador;
 
-    ///procesamos al jug antes de iniciar la partida
+    ///procesamos al jugador antes de iniciar la partida
     //existe?lo buscamos, no existe? lo agregamos al arbol
     if (gestionarJugador(nombreJugador, arbolIndices, archJugadores, &datosJugador) != TODO_OK)
     {
-        puts("Error al procesar jugador..");
+        puts("Error al procesar jugador...");
         return ERROR_PARTIDA;
     }
 
     ///validar q se haya creado un tablero valido
-    if(generarTablero(&tablero, CARAVANA_ARCH)!=TODO_OK)
+    if(generarTablero(&tablero, CARAVANA_ARCH) != TODO_OK)
     {
         puts("No se pudo generar el tablero...");
         return ERROR_PARTIDA;
     }
 
     ///imprimir/crear tablero desde CARAVANA_ARCH!
-    iniciarPartida(&tablero, archPartidas, datosJugador.id);
-
+    iniciarPartida(tablero.vidasInicio, archPartidas, datosJugador.id);
 
     return TODO_OK;
 }
 
-int iniciarPartida(tTablero *tablero,FILE* archPartidas,int idJugador)
+int iniciarPartida(int vidasInicio, FILE* archPartidas, int idJugador)
 {
-    ///durante el juego simepre tener puntero a jugador
-    tJugador jugador;
+    ///durante el juego, siempre tener puntero a jugador y cada bandido
     tListaCD mapa;
+    tJugador jugador = {.vidas = vidasInicio};
     tLista bandidosGlobales;
     tLista movimientos;
     tPartida registroPartida;
     unsigned turno = 0;
 
     crearListaCD(&mapa);
-
     crearLista(&bandidosGlobales);
     crearLista(&movimientos);
-    ///cargo la listaCD y todos los bandidos
-    cargarMapa(&mapa, &jugador, tablero->vidasInicio, &bandidosGlobales);
 
+    ///cargo la listaCD, jugador y todos los bandidos
+    cargarMapa(&mapa, &jugador, &bandidosGlobales);
 
+    ///juego termina si jugador se queda sin vida o llega a la salida
     while(jugador.vidas != 0 && ((tTerreno*)jugador.posActual->info)->icon != ICON_SALIDA)
     {
         renderizarPantalla(&mapa, jugador.vidas, jugador.proteccion, jugador.puntos, jugador.turno, turno);
@@ -91,19 +90,13 @@ int iniciarPartida(tTablero *tablero,FILE* archPartidas,int idJugador)
     return jugador.vidas ? SI : NO;
 }
 
-void mostrarMovimientos(tLista* movimientos)
+void mostrarMovimientos(tLista *movimientos)
 {
-    tIteradorLista it;
-    tMovimiento* mov;
+    tMovimiento mov;
 
-    mov= obtenerPrimeroInfo(movimientos, &it);
+    while(sacarPrimeroLista(movimientos, &mov, sizeof(mov)) == L_EXITO)
+        printf("%c%u  ", mov.direccion == AVANZAR ? 'F' : 'B', mov.pasos);
 
-    while(mov)
-    {
-        printf("%c%u  ", mov->direccion=='A' ? 'F' : 'B', mov->pasos);
-
-        mov= obtenerSiguienteInfo(&it);
-    }
     putchar('\n');
 }
 

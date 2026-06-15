@@ -11,6 +11,7 @@
 #define SIN_JUGADOR       6
 #define JUGADOR_EXISTENTE 7
 #define DUPLICADO         8
+#define FIN_PARTIDA       9
 
 //tamaños def
 #define TAMLINEA        100

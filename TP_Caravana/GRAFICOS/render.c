@@ -11,7 +11,7 @@
 
 void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, char turno, unsigned nTurno)
 {
-    tNodo *act, *inicio;
+    tNodoCD *act, *inicio;
 
     char fila[COLUMNAS_MAPA][ALTO_CASILLA][MAX_TEXTO_CASILLA];
 

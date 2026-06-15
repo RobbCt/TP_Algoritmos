@@ -17,7 +17,7 @@
 void mostrarReglas();
 int nuevaPartida(const char* nombreJugador, tArbolBinBusq *arbolIndices,
                  FILE *archJugadores,FILE *archPartidas);
-int iniciarPartida(tTablero *tablero, FILE *archPartidas,int idJugador);
+int iniciarPartida(int vidasInicio, FILE* archPartidas, int idJugador);
 void mostrarMovimientos(tLista* movimientos);
 
 #endif // JUEGO_H_INCLUDED

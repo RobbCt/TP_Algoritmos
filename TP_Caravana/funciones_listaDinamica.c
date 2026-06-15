@@ -4,21 +4,19 @@
 void crearLista(tLista *p)
 {
     ///el puntero del main es quien apunta al nodo
-
-    //(*p) es el puntero del main
-    //(p) es el puntero al puntero del main
+    //*p es el puntero del main, p es el puntero al puntero del main
     *p = NULL;
 }
 
 int listaVacia(const tLista *p)
 {
     //si el puntero del main apunta a nulo, esta vacio
-    return *p == NULL ? LISTA_VACIA : LISTA_DISPONIBLE;
+    return *p == NULL ? L_VACIA : L_DISPONIBLE;
 }
 
 int listaLlena(const tLista *p, unsigned cantBytes)
 {
-    return LISTA_DISPONIBLE;
+    return L_DISPONIBLE;
 }
 
 void vaciarLista(tLista *p)
@@ -33,7 +31,7 @@ void vaciarLista(tLista *p)
     }
 }
 
-int ponerAlComienzo(tLista *p,const void *d, unsigned tamBytes)
+int ponerAlComienzoLista(tLista *p,const void *d, unsigned tamBytes)
 {
      tNodoL *nue;
 
@@ -42,7 +40,7 @@ int ponerAlComienzo(tLista *p,const void *d, unsigned tamBytes)
      if(nue == NULL || (nue->info = malloc(tamBytes)) == NULL)
      {
          free(nue);
-         return SIN_MEM;
+         return L_SIN_MEM;
      } //reservo memoria para todo el nodo
 
     memcpy(nue->info, d, tamBytes);
@@ -50,7 +48,7 @@ int ponerAlComienzo(tLista *p,const void *d, unsigned tamBytes)
     nue->sig = *p; //el nuevo nodo tiene como siguiente el primero nodo
     *p = nue; //ahora el neuvo nodo es el primero
 
-    return EXITO;
+    return L_EXITO;
 }
 
 int sacarPrimeroLista(tLista *p, void *d, unsigned tamBytes)
@@ -58,7 +56,7 @@ int sacarPrimeroLista(tLista *p, void *d, unsigned tamBytes)
     tNodoL *sale = *p;
 
     if(*p == NULL)
-        return LISTA_VACIA;
+        return L_VACIA;
 
     *p = sale->sig;
     memcpy(d, sale->info, MIN(sale->tamInfo, tamBytes));
@@ -66,20 +64,20 @@ int sacarPrimeroLista(tLista *p, void *d, unsigned tamBytes)
     free(sale->info);
     free(sale);
 
-    return EXITO;
+    return L_EXITO;
 }
 
 int verPrimeroLista(const tLista *p, void *d, unsigned tamBytes)
 {
     if(*p == NULL)
-        return LISTA_VACIA;
+        return L_VACIA;
 
     memcpy(d, (*p)->info, MIN((*p)->tamInfo, tamBytes));
 
-    return EXITO;
+    return L_EXITO;
 }
 
-int ponerAlFinal(tLista *p, const void *d, unsigned tamBytes)
+int ponerAlFinalLista(tLista *p, const void *d, unsigned tamBytes)
 {
     tNodoL *nue;
 
@@ -87,7 +85,7 @@ int ponerAlFinal(tLista *p, const void *d, unsigned tamBytes)
     if(nue == NULL || (nue->info = malloc(tamBytes)) == NULL)
     {
         free(nue);
-        return SIN_MEM;
+        return L_SIN_MEM;
     }
 
     memcpy(nue->info, d, tamBytes);
@@ -103,13 +101,13 @@ int ponerAlFinal(tLista *p, const void *d, unsigned tamBytes)
 
     *p = nue; //[*p] es el puntero del campo sig del ultimo nodo (era NULL), siguiente al ultimo = nue
 
-    return EXITO;
+    return L_EXITO;
 }
 
 int sacarUltimoLista(tLista *p, void *d, unsigned tamBytes)
 {
     if(*p == NULL)
-        return LISTA_VACIA;
+        return L_VACIA;
 
     while((*p)->sig) //mientras el nodo [*p] apunte a, otro nodo con un sig
         p = &(*p)->sig;
@@ -121,102 +119,128 @@ int sacarUltimoLista(tLista *p, void *d, unsigned tamBytes)
 
     *p = NULL;
 
-    return EXITO;
+    return L_EXITO;
 }
 
 int verUltimoLista(const tLista *p, void *d, unsigned tamBytes)
 {
     if(*p == NULL)
-        return LISTA_VACIA;
+        return L_VACIA;
 
     while((*p)->sig)
         p = &(*p)->sig;
 
     memcpy(d, (*p)->info, MIN(tamBytes, (*p)->tamInfo));
 
-    return EXITO;
+    return L_EXITO;
 }
 
-void* obtenerPrimeroInfo(tLista *p, tIteradorLista *it)
+int verInfoNodoLista(const tNodoL *nodo, void *d, unsigned tamBytes)//rm
 {
-    if(*p == NULL)
-        return NULL;
+    //con la dir del nodo, copio la info
+    if(!nodo || !nodo->info)
+        return L_VACIA;
+
+    memcpy(d, nodo->info, MIN(tamBytes, nodo->tamInfo));
+
+    return L_EXITO;
+}
+
+int modificarInfoNodoLista(tNodoL *nodo, const void *d, unsigned tamBytes)//rm
+{
+    if(!nodo)
+        return L_VACIA;
+
+    memcpy(nodo->info, d, MIN(tamBytes, nodo->tamInfo));
+
+    return L_EXITO;
+}
+
+///ITERADOR///
+
+int iniciarPrimeroItLista(tIteradorLista *it, const tLista *p)
+{
+    if(!it || !*p)
+        return L_VACIA;
 
     it->actual = *p;
     it->posicion = 0;
 
-    return it->actual->info;
+    return L_EXITO;
 }
 
-void* obtenerSiguienteInfo(tIteradorLista *it)
+int verActualItLista(tIteradorLista *it, void *d, unsigned tamBytes)
 {
-    if(it->actual == NULL || it->actual->sig == NULL)
-        return NULL;
+    if(!it || !it->actual)
+        return L_NO_ENCONTRADO;
+
+    memcpy(d, it->actual->info, MIN(tamBytes, it->actual->tamInfo));
+
+    return L_EXITO;
+}
+
+int avanzarItLista(tIteradorLista *it)
+{
+    if(!it || !it->actual)
+        return L_VACIA;
 
     it->actual = it->actual->sig;
     it->posicion++;
 
-    return it->actual->info;
+    return L_EXITO;
 }
 
-tNodoL* obtenerPrimerNodo(tLista *p, tIteradorLista *it)
+int modificarActualItLista(tIteradorLista *it, const void *d, unsigned tamBytes)
 {
-    if(*p == NULL)
-        return NULL;
+    if(!it || !it->actual || !d)
+        return L_NO_ENCONTRADO;
 
-    it->actual = *p;
-    it->posicion = 0;
+    memcpy(it->actual->info, d, MIN(tamBytes, it->actual->tamInfo));
 
-    return it->actual;
+    return L_EXITO;
 }
 
-tNodoL* obtenerSiguienteNodo(tIteradorLista *it)
+int eliminarActualItLista(tIteradorLista *it, tLista *p)
 {
-    if(it->actual == NULL || it->actual->sig == NULL)
-        return NULL;
+    tNodoL *ant = NULL, *act = *p, *aEliminar = it->actual;
 
-    it->actual = it->actual->sig;
-    it->posicion++;
+    if(!*p || !it || !it->actual)
+        return L_NO_ENCONTRADO;
 
-    return it->actual;
-}
-
-int elimDirDeLista(tLista *p, const void *d)
-{
-    tNodoL *anterior = NULL, *aEliminar = NULL;
-
-    //si la lista esta vacia
-    if(!*p)
-        return LISTA_VACIA;
-
-    //itero hasta llegar a fin de lista o encontrar la direccion
-    while(*p && (tNodoL*)d != *p)
+    while(act && act != aEliminar)
     {
-        anterior = *p;
-        p = &(*p)->sig;
+        ant = act;
+        act = act->sig;
     }
 
-    //si llegue a fin de lista no lo encontre
-    if(!*p)
-    {
-        puts("\nbandido HGHFH");
-        system("pause");
-        return NO_ENCONTRADO;
+    if(!act)
+        return L_NO_ENCONTRADO;
 
-    }
-
-    //antes de modificar *p
-    aEliminar = *p;
-
-    //si lo encontre, lo engancho
-    if(anterior)
-        anterior->sig = aEliminar->sig;
+    if(!ant)
+        *p = act->sig;
     else
-        *p = aEliminar->sig;
+        ant->sig = act->sig;
 
-    //elimino el nodo
-    free(aEliminar->info);
-    free(aEliminar);
+    it->actual = act->sig;
 
-    return EXITO;
+    free(act->info);
+    free(act);
+
+    return L_EXITO;
 }
+
+int esValidoItLista(const tIteradorLista *it)
+{
+    return it && it->actual != NULL;
+}
+
+void reiniciarItLista(tIteradorLista *it)
+{
+    if(!it)
+        return;
+
+    it->actual = NULL;
+    it->posicion = 0;
+}
+
+

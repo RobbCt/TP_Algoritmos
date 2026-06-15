@@ -13,206 +13,427 @@
 
 typedef struct
 {
-    tNodo* destino;
+    tNodoCD* destino;
     unsigned pasos;
     char direccion;
-    int peso;
+    int temperatura;
 }tOpcionMov;
 
 
 
-unsigned tirarDado();
+int cargarTerrenoInicioDesdeArch(FILE *pf, tJugador *jugador, tListaCD *mapa);
+int cargarTerrenosSiguientesDesdeArch(FILE *pf, tLista *bGlobales, tListaCD *mapa);
+int cargarMovJugador(tListaCD *mapa, tJugador *jugador, tCola *colaMov, tLista *listaMovPartida);
+int cargarMovBandidos(tListaCD *mapa, tLista *bGlobales, tCola *colaMovimientos, unsigned turno);
+int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, tListaCD* mapa, unsigned turno);
+
+
+
 char iconoDeLinea(char* linea);
 int contarBandidosEnLinea(char *linea);
-int verificar(tListaCD *m);
-int contarBandidosEnLinea(char *linea);
-void cargarMovJugador(tMovimiento *mov, tJugador *jugador);
-void cargarMovBandido(tMovimiento *mov, tBandido *bandido, unsigned turno);
-int posicionJugador(tJugador* j);
+char ingresoDireccionDeMov(tListaCD *mapa, tJugador *jugador, unsigned numDado);
+unsigned tirarDado();
+int esMovValido(char direccion, int puedeRetroceder);
+int destinoDeJugador(tMovimiento *mov, tJugador *jugador, tListaCD *mapa, unsigned numDado, char direccion);
+void destinoDeBandido(tMovimiento *mov, tBandido *bandido, tListaCD *mapa, unsigned turnoAc);
+void IABandidos(tMovimiento *mov, tBandido *bandido, tListaCD *mapa, unsigned turnoAc);
+int calcularTemperaturaMov(tBandido *bandido, tTerreno *terrenoAc, char sentido, unsigned turnoAc);
+int moverJugador(tJugador *jugador, tMovimiento *mov, char protegido);
+int moverBandido(tBandido *bandido, tMovimiento *mov, unsigned turno);
+int colisionJugadorBandido(tIteradorLista *itBandidos, tLista *bGlobales, tBandido *bandido, tJugador *jugador, tListaCD *mapa, char protegido);
 
 
 
-int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlobales)
+int cargarMapa(tListaCD *mapa, tJugador *jugador, tLista *bGlobales)
 {
+    //cargo el mapa con los datos del tablero en CARAVANA.txt
+
+    //quitar despues del push de dai
     FILE *pf = fopen(CARAVANA_ARCH, "rt");
     if(!pf)
         return ERROR_ARCHIVO;
 
-    char linea[TAMLINEA];
-    tTerreno terreno;
+//    FILE *pf;
+//    abrirArchivo(&pf, CARAVANA_ARCH, "rt");
 
-    ///cragamos el primer casillero a la listaCD
-    fgets(linea, sizeof(linea), pf);
-    if(strcmpi(linea,"01:[I J]\n") == 0)
-    {
-        terreno.icon = ICON_INICIO;
-        terreno.turnoActualizado = 0;
-        terreno.bandidos = 0;
-        terreno.jugador = 1;
+    cargarTerrenoInicioDesdeArch(pf, jugador, mapa);
 
-        jugador->icon = ICON_JUGADOR;
-        jugador->proteccion = NO;
-        jugador->turno = SI;
-        jugador->vidas = vidasJugador;
-        jugador->puntos = 0;
-
-        ponerAlFinalCD(mapa, &terreno, sizeof(terreno));
-
-        jugador->posActual = *mapa;
-    }
-    else
-    {
-        fclose(pf);
-        return ERROR_TABLERO;
-    }
-
-    ///cargamos los siguientes casilleros a la listaCD
-    while(fgets(linea, sizeof(linea), pf))
-    {
-        tBandido bandido;
-        int cantB = contarBandidosEnLinea(linea);
-        char icon = iconoDeLinea(linea);
-
-        if(icon == ICON_SALIDA && cantB > 0)
-        {
-            terreno.icon = ICON_SALIDA;
-            terreno.turnoActualizado = 0;
-            terreno.jugador = 0;
-            terreno.bandidos = cantB;
-        }
-        else if(cantB > 0)
-        {
-            //bandidos en terreno
-            terreno.icon = ICON_PUNTO;
-            terreno.turnoActualizado = 0;
-            terreno.jugador = 0;
-            terreno.bandidos = cantB;
-
-            //bandido.icon = ICON_BANDIDO;
-            //bandido.ultimoMov = '\0';
-        }
-        else
-        {
-            //puntos, tormentas, oasis, vidas, salida en terreno
-            terreno.icon = icon;
-            terreno.turnoActualizado = 0;
-            terreno.bandidos = 0;
-            terreno.jugador = 0;
-        }
-
-        ///terreno cargado
-        ponerAlFinalCD(mapa, &terreno, sizeof(terreno));
-
-        ///posicion de bandido (cada uno apunta a su nodo)
-        if(terreno.bandidos)
-        {
-            for(int i = 0; i < terreno.bandidos; i++)
-            {
-                bandido.icon = ICON_BANDIDO;
-                bandido.ultimoMov = '\0';
-                bandido.posActual = (*mapa)->ant;
-
-                ponerAlFinal(bGlobales, &bandido, sizeof(bandido));
-            }
-        }
-
-    }
+    cargarTerrenosSiguientesDesdeArch(pf, bGlobales, mapa);
 
     fclose(pf);
     return TODO_OK;
 }
 
-void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigned turno, tLista* listaMovimientos) //considerando hacerlo int y usar macros para diferentes panoramas
+void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigned turno, tLista* listaMovPartida) //considerando hacerlo int y usar macros para diferentes panoramas
 {
-
-    tMovimiento mov;
+    //encolo los movimientos de jugador y cada bandido
     tCola colaMovimientos;
-    tIteradorLista it;
-    tBandido *bandido;
 
     crearCola(&colaMovimientos);
-    if(jugador->turno == SI)
-    {
-        cargarMovJugador(&mov, jugador);
-        ponerAlFinal(listaMovimientos,&mov, sizeof(mov));
-//        Sleep(5000);
-        ponerEnCola(&colaMovimientos, &mov, sizeof(mov));
-    }
-    else
-    {
-        puts("Turno perdido por tormenta");
-//        Sleep(5000);
-    }
 
-    ///calculo el movimiendo de cada bandido
-    bandido = (tBandido*)obtenerPrimeroInfo(bGlobales, &it);
-    while(bandido != NULL)
-    {
-        cargarMovBandido(&mov, bandido, turno);
+    cargarMovJugador(mapa, jugador, &colaMovimientos, listaMovPartida);
 
-        ponerEnCola(&colaMovimientos, &mov, sizeof(mov));
-
-        bandido = (tBandido*)obtenerSiguienteInfo(&it);
-    }
+    cargarMovBandidos(mapa, bGlobales, &colaMovimientos, turno);
 
     realizarMovimientos(jugador, bGlobales, &colaMovimientos, mapa, turno);
 
     vaciarCola(&colaMovimientos);
 }
 
-void IABandidos(tMovimiento *mov, tBandido *bandido, unsigned turnoAc)
+///SUB-PROCESOS///
+
+int cargarTerrenoInicioDesdeArch(FILE *pf, tJugador *jugador, tListaCD *mapa)
+{
+    ///cragamos el primer casillero a la listaCD
+    tTerreno terreno;
+    char linea[TAMLINEA];
+
+    fgets(linea, sizeof(linea), pf);
+
+    if(strcmpi(linea,"01:[I J]\n") == 0)
+    {
+        terreno.icon = ICON_INICIO;
+        terreno.turnoActualizado = 0;
+        terreno.bandidos = 0;
+        terreno.jugador = 1;
+        //vidas ya cargadas
+
+        jugador->icon = ICON_JUGADOR;
+        jugador->proteccion = NO;
+        jugador->turno = SI;
+        jugador->puntos = 0;
+
+        ponerAlFinalCD(mapa, &terreno, sizeof(terreno));
+
+        jugador->posActual = obtenerPrimerNodoListaCD(mapa);
+
+    }
+    else
+        return ERROR_TABLERO;
+
+    return TODO_OK;
+}
+
+int cargarTerrenosSiguientesDesdeArch(FILE *pf, tLista *bGlobales, tListaCD *mapa)
+{
+    //cargamos los demas casilleros a la listaCD
+    tTerreno terreno;
+    tBandido bandido;
+    char linea[TAMLINEA];
+
+    //itero hasta terminar CARAVANA.txt
+    while(fgets(linea, sizeof(linea), pf))
+    {
+        //cargo terreno
+        terreno.icon = iconoDeLinea(linea);
+        terreno.turnoActualizado = 0;
+        terreno.bandidos = contarBandidosEnLinea(linea);
+        terreno.jugador = 0;
+
+        //terreno en listaCD
+        ponerAlFinalCD(mapa, &terreno, sizeof(terreno));
+
+        if(terreno.bandidos)
+        {
+            //cargo bandidos en lista (cada uno apunta a su nodo)
+            for(int i = 0; i < terreno.bandidos; i++)
+            {
+                bandido.icon = ICON_BANDIDO;
+                bandido.ultimoMov = '\0';
+                bandido.posActual = obtenerUltimoNodoListaCD(mapa);
+
+                ponerAlFinalLista(bGlobales, &bandido, sizeof(bandido));
+            }
+        }
+    }
+
+    return TODO_OK;
+}
+
+int cargarMovJugador(tListaCD *mapa, tJugador *jugador, tCola *colaMov, tLista *listaMovPartida)
+{
+    //carga el mov de jugador en la cola de movimientos y la lista de resumen de movimientos
+    tMovimiento mov;
+    char direccion;
+    unsigned numDado = tirarDado();
+
+    if(jugador->turno == NO)
+    {
+        puts("La tormenta te atrapo, pierdes un turno!");
+        //Sleep(5000);
+        return TODO_OK;
+    }
+
+    printf("\nTiraste el dado y salio el numero %u\n", numDado);
+    printf("\nDesea Avanzar o Retroceder? [A - R]: ");
+
+    direccion = ingresoDireccionDeMov(mapa, jugador, numDado);
+
+    //cargo la variable tMovimiento mov con sus valores finales
+    destinoDeJugador(&mov, jugador, mapa, numDado, direccion);
+
+    ponerAlFinalLista(listaMovPartida, &mov, sizeof(mov));
+    ponerEnCola(colaMov, &mov, sizeof(mov));
+
+    return TODO_OK;
+}
+
+int cargarMovBandidos(tListaCD *mapa, tLista *bGlobales, tCola *colaMovimientos, unsigned turno)
+{
+    //calculo el sigueinte movimiendo de cada bandido (si existen)
+    tIteradorLista itBandidos;
+    tMovimiento mov;
+    tBandido bandido;
+
+    if(iniciarPrimeroItLista(&itBandidos, bGlobales) == L_EXITO)
+    {
+        do{
+            verActualItLista(&itBandidos, &bandido, sizeof(bandido));
+
+            destinoDeBandido(&mov, &bandido, mapa, turno);
+
+            ponerEnCola(colaMovimientos, &mov, sizeof(mov));
+
+        }while(avanzarItLista(&itBandidos) == L_EXITO);
+
+    }
+
+    return TODO_OK;
+}
+
+int realizarMovimientos(tJugador* jugador, tLista *bGlobales, tCola* colaMovimientos, tListaCD* mapa, unsigned turno)
+{
+    tIteradorLista itBandidos;
+    tBandido bandido;
+    tMovimiento movArealizar;
+    char protegidoEsteTurno = jugador->proteccion;
+
+    jugador->proteccion = NO;//para que la proteccion solo dure un turno
+
+    sacarDeCola(colaMovimientos, &movArealizar, sizeof(movArealizar));
+
+    if(moverJugador(jugador, &movArealizar, protegidoEsteTurno) == FIN_PARTIDA)
+        return TODO_OK;
+
+    //mover a cada bandido de la lista bGlobales (si hay movimientos)
+    if(iniciarPrimeroItLista(&itBandidos, bGlobales) == L_EXITO)
+    {
+
+        while(esValidoItLista(&itBandidos))
+        {
+            sacarDeCola(colaMovimientos, &movArealizar, sizeof(tMovimiento));
+
+            //recupero un bandido de lista y lo actualizo (lo muevo)
+            verActualItLista(&itBandidos, &bandido, sizeof(bandido));
+            moverBandido(&bandido, &movArealizar, turno);
+            modificarActualItLista(&itBandidos, &bandido, sizeof(bandido));
+
+
+            if(jugador->posActual == bandido.posActual)
+                colisionJugadorBandido(&itBandidos, bGlobales, &bandido, jugador, mapa, protegidoEsteTurno);
+            else
+                avanzarItLista(&itBandidos);
+
+            //si un bandido murio y se saco de la pila
+            //ya se avanzo en la lista
+        }
+    }
+
+    return TODO_OK;
+}
+
+///HELPERS///
+
+char iconoDeLinea(char* linea)
+{
+    char *reg;
+
+    reg = strchr(linea, ':');
+
+    //si no hay ':'
+    if(reg == NULL)
+        return ERROR_ARCHIVO;
+
+    //despues de ':'
+    reg++;
+
+    //buscamos el primer item inmovil despues de ':'
+    while(*reg)
+    {
+        if(*reg == ICON_PUNTO || *reg == ICON_PREMIO ||
+           *reg == ICON_VIDA || *reg == ICON_OASIS ||
+           *reg == ICON_TORMENTA || *reg == ICON_SALIDA)
+        {
+            return *reg;
+        }
+        reg++;
+    }
+
+    //si no hay item, retorna '.' por defecto
+    return ICON_PUNTO;
+}
+
+int contarBandidosEnLinea(char* linea)
+{
+    //cuenta cuantos chars 'B' hay en la cadena a partir de ':'
+    char *reg = strchr(linea, ':');
+    int cant = 0;
+
+    if(reg == NULL)
+        return 0;
+
+    reg++;
+
+    while(*reg)
+    {
+        if(*reg == 'B')
+            cant++;
+
+        reg++;
+    }
+
+    return cant;
+}
+
+char ingresoDireccionDeMov(tListaCD *mapa, tJugador *jugador, unsigned numDado)
+{
+    int puedeRetroceder = posEnListaCD(mapa, jugador->posActual) >= numDado;
+    char direccion;
+
+    scanf(" %c", &direccion);
+    direccion = toupper(direccion);
+
+    while(!esMovValido(direccion, puedeRetroceder))
+    {
+        printf("\nNO ES UNA OPCION VALIDA, REINGRESE: ");
+        scanf(" %c", &direccion);
+        direccion = toupper(direccion);
+    }
+
+    return direccion;
+}
+
+unsigned tirarDado()
+{
+    int num = rand()%6+1;
+    return num;
+}
+
+int esMovValido(char direccion, int puedeRetroceder)
+{
+    if(direccion == AVANZAR)
+        return 1;  //avanzar siempre es valido
+
+    if(direccion == RETROCEDER && puedeRetroceder)
+        return 1;  //retroceder solo si puede
+
+    return 0;  //cualquier otra combinacion inválida
+}
+
+int destinoDeJugador(tMovimiento *mov, tJugador *jugador, tListaCD *mapa, unsigned numDado, char direccion)
+{
+    tTerreno terrDestino;
+    tIteradorCD itMapa;
+    char direccionRebote = direccion;
+
+    iniciarNodoItCD(&itMapa, jugador->posActual);
+
+    for(int i = 0; i < numDado; i++)
+    {
+        verActualItCD(&itMapa, &terrDestino, sizeof(terrDestino));
+
+        if(direccionRebote == AVANZAR)
+        {
+            if(terrDestino.icon == ICON_SALIDA)
+            {
+                direccionRebote = RETROCEDER;
+                retrocederItCD(&itMapa);
+            }
+            else
+                avanzarItCD(&itMapa);
+        }
+        else
+            retrocederItCD(&itMapa);
+    }
+
+    mov->destino = verNodoActualItCD(&itMapa);
+    mov->pasos = numDado;
+    mov->direccion = direccion;
+
+    return TODO_OK;
+}
+
+void destinoDeBandido(tMovimiento *mov, tBandido *bandido, tListaCD *mapa, unsigned turnoAc)
+{
+    IABandidos(mov, bandido, mapa, turnoAc);
+}
+
+void IABandidos(tMovimiento *mov, tBandido *bandido, tListaCD *mapa, unsigned turnoAc)
 {
     /* --------------------------------------------------
-        ALGORITMO CALIENTE-FRIO q m invente
+                        CALIENTE-FRIO
         casilla caliente = posible presencia del jugador
         casilla fria  = casilla viglada
     ---------------------------------------------------*/
 
     tOpcionMov opciones[RANGO_BANDIDOS * 2];
-    tNodo *destino;
+    tIteradorCD itMapa;
+    tTerreno terrenoAct;
     int resultado, acum = 0, nCasilla = 0, tempTotal = 0;
 
     ///AVANZAR Y RECONOCER TERRENO
 
     //nodo del bandido
-    destino = bandido->posActual;
+    iniciarNodoItCD(&itMapa, bandido->posActual);
 
     //mientras iteramos las 6 casillas posteriores, guardamos los datos de cada una
     for(int i = 0; i < RANGO_BANDIDOS; i++)
     {
-        destino = destino->sig;
+        avanzarItCD(&itMapa);
 
-        opciones[nCasilla].destino = destino;
+        opciones[nCasilla].destino = verNodoActualItCD(&itMapa);
         opciones[nCasilla].pasos = i+1;
-        opciones[nCasilla].direccion = 'A'; //posterior-avance
+        opciones[nCasilla].direccion = AVANZAR; //posterior-avance
 
-        //con el nodo i posterior al bandido, calculo la temperatura de este terreno
-        opciones[nCasilla].peso = calcularTemperaturaMov(bandido, destino, 'A', turnoAc);
+        //obtengo el terreno posterior
+        verActualItCD(&itMapa, &terrenoAct, sizeof(terrenoAct));
 
-        //acumulo el peso de todas las casillas para la ponderacion
-        tempTotal += opciones[nCasilla].peso;
+        //con el terreno i posterior al bandido, calculo la temperatura del mismo
+        opciones[nCasilla].temperatura = calcularTemperaturaMov(bandido, &terrenoAct, AVANZAR, turnoAc);
+
+        //acumulo la temperatura de todas las casillas para la ponderacion
+        tempTotal += opciones[nCasilla].temperatura;
         nCasilla++;
     }
+
+
+
+    reiniciarItCD(&itMapa);
+
+
 
     ///RETROCEDER Y RECONOCER TERRENO
 
     //nodo del bandido
-    destino = bandido->posActual;
+    iniciarNodoItCD(&itMapa, bandido->posActual);
 
     //mientras iteramos las 6 casillas anteriores, guardamos los datos de cada una
     for(int i = 0; i < RANGO_BANDIDOS; i++)
     {
-        destino = destino->ant;
+        retrocederItCD(&itMapa);
 
-        opciones[nCasilla].destino = destino;
+        opciones[nCasilla].destino = verNodoActualItCD(&itMapa);
         opciones[nCasilla].pasos = i+1;
-        opciones[nCasilla].direccion = 'R'; //anterior-retrocedo
+        opciones[nCasilla].direccion = RETROCEDER; //anterior-retrocedo
 
-        //con el nodo i anterior al bandido, calculo la temperatura de este terreno
-        opciones[nCasilla].peso = calcularTemperaturaMov(bandido, destino, 'R', turnoAc);
+        //obtengo el terreno anterior
+        verActualItCD(&itMapa, &terrenoAct, sizeof(terrenoAct));
 
-        //acumulo el peso de todas las casillas para la ponderacion
-        tempTotal += opciones[nCasilla].peso;
+        //con el terreno i anterior al bandido, calculo la temperatura del mismo
+        opciones[nCasilla].temperatura = calcularTemperaturaMov(bandido, &terrenoAct, RETROCEDER, turnoAc);
+
+        //acumulo la temperatura de todas las casillas para la ponderacion
+        tempTotal += opciones[nCasilla].temperatura;
         nCasilla++;
     }
 
@@ -224,7 +445,7 @@ void IABandidos(tMovimiento *mov, tBandido *bandido, unsigned turnoAc)
     //esta es la forma mas corta (me vi un tiktok)
     for(int i = 0; i < nCasilla; i++)
     {
-        acum += opciones[i].peso;
+        acum += opciones[i].temperatura;
 
         //acumulo el peso de las casillas para ver en cual cayo el resultado
         if(resultado < acum)
@@ -235,23 +456,17 @@ void IABandidos(tMovimiento *mov, tBandido *bandido, unsigned turnoAc)
             return;
         }
     }
-
-    /// si la ponderacion sale mal, elejir la primera opcion
-    mov->destino = opciones[0].destino;
-    mov->pasos = opciones[0].pasos;
-    mov->direccion = opciones[0].direccion;
 }
 
-int calcularTemperaturaMov(tBandido *bandido, tNodo *destino, char sentido, unsigned turnoAc)
+int calcularTemperaturaMov(tBandido *bandido, tTerreno *terrenoAc, char sentido, unsigned turnoAc)
 {
-    tTerreno *terrenoAc = (tTerreno*)destino->info;
     int temp = 0;
     unsigned edad;
 
     /// ----- TEMPERATURA PERSISTENTE -----
 
-    ///+15 si es terreno clave
-    if(terrenoAc->icon == 'P' || terrenoAc->icon == 'V' || terrenoAc->icon == 'O')
+    ///+ si es terreno clave
+    if(terrenoAc->icon == ICON_PREMIO || terrenoAc->icon == ICON_VIDA || terrenoAc->icon == ICON_OASIS)
         temp += CASILLA_CLAVE;
 
     //si el terreno fue visitado en algun turno...
@@ -261,17 +476,17 @@ int calcularTemperaturaMov(tBandido *bandido, tNodo *destino, char sentido, unsi
         edad = turnoAc - terrenoAc->turnoActualizado;
 
         if(edad <= 1)
-            temp -= TURNO_ANT_V; ///-30 si fue visitado en el turno anterior
+            temp -= TURNO_ANT_V; ///- si fue visitado en el turno anterior
         else if(edad <= MEM_V)
-            temp -= ANTES_V; ///-10 si fue visitado (no en turno anterior)
+            temp -= ANTES_V; ///- si fue visitado (no en turno anterior)
     }
     else
-        temp += NUNCA_V; ///+20 si nunca fue visitado
+        temp += NUNCA_V; ///+ si nunca fue visitado
 
     /// ----- TEMPERATURA TEMPORAL -----
 
-    ///+20 para q tenga inercia y siga le movimiento q tenia el bandido
-    if(bandido->ultimoMov == 'A' || bandido->ultimoMov == 'R')
+    ///+ para q tenga inercia y siga le movimiento q tenia el bandido
+    if(bandido->ultimoMov == AVANZAR || bandido->ultimoMov == RETROCEDER)
     {
         if(bandido->ultimoMov == sentido)
             temp += MISMA_DIRECCION;
@@ -279,272 +494,182 @@ int calcularTemperaturaMov(tBandido *bandido, tNodo *destino, char sentido, unsi
             temp -= MISMA_DIRECCION;
     }
 
-    ///-30 si ya hay bandidos
+    ///- si ya hay bandidos
     if(terrenoAc->bandidos > 0)
         temp -= HAY_BANDIDOS;
 
-    ///=5 temperatura mínima (para q aparezcan en la ponderacion)
+    ///= temperatura mínima (para q aparezcan en la ponderacion)
     if(temp <= 0)
         temp = TEMP_MIN;
 
     return temp;
 }
 
-
-int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, tListaCD* mapa, unsigned turno)
+int moverJugador(tJugador *jugador, tMovimiento *mov, char protegido)
 {
-    tTerreno *terreno = NULL;
-    tBandido *bandidoN = NULL;
-    tNodoL *dirBandidoN = NULL;
-    tIteradorLista itInfoBand;
-    tIteradorLista itDirBand;
-    tMovimiento movArealizar;
-    int protegidoEsteTurno = j->proteccion; //para que la proteccion solo dure un turno
-    j->proteccion = NO;
+    tIteradorCD itMapa;
+    tTerreno terreno;
 
-    sacarDeCola(colaMovimientos, &movArealizar, sizeof(tMovimiento));
-
-
-    if(j->turno == SI)
+    if(jugador->turno == NO)
     {
-        ///sacar jugador de casilla actual
-        terreno = (tTerreno*)j->posActual->info;
-        terreno->jugador = 0;
+        jugador->turno = SI;
+        return TODO_OK;
+    }
 
+    //recupero el terreno donde esta el jugador
+    iniciarNodoItCD(&itMapa, jugador->posActual);
+    verActualItCD(&itMapa, &terreno, sizeof(terreno));
 
-        ///poner a jugador en casilla destino
-        j->posActual = movArealizar.destino;
-        terreno = (tTerreno*)j->posActual->info;
-        terreno->jugador = 1;
+    //le quito el juagador
+    terreno.jugador = 0;
 
-//        //terreno es el destino del jugador
-//        if(terreno->tormenta)
-//        {
-//            if(protegidoEsteTurno == SI)
-//            {
-//                printf("\nUna tormenta te intercepto, pero al estar protegido no pierdes el turno!");
-//            }
-//            else
-//            {
-//                j->turno = NO;
-//                terreno->tormenta = 0; //el jugador hace desaparecer la tormenta?
-//            }
-//        }
+    //actualizo el terreno en el mapa
+    modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
 
-        //terreno es el destino del jugador
-        switch(terreno->icon)
-        {
-            case ICON_TORMENTA:
+    //MUEVO EL JUGADOR
+    jugador->posActual = mov->destino;
 
-                if(protegidoEsteTurno == SI)
+    //recupero el terreno donde esta el jugador
+    iniciarNodoItCD(&itMapa, jugador->posActual);
+    verActualItCD(&itMapa, &terreno, sizeof(terreno));
+
+    //le anado el jugador y...
+    terreno.jugador = 1;
+
+    //...modifico el terreno de la colision...
+    switch(terreno.icon)
+    {
+        case ICON_TORMENTA:
+            if(protegido == SI)
                 {
                     printf("\nUna tormenta te intercepto, pero al estar protegido no pierdes el turno!");
+                    Sleep(5000);
                 }
-                else
+            else
                 {
-
-                    terreno->icon = ICON_PUNTO; //el jugador hace desaparecer la tormenta?
-                    j->turno = NO;
+                    printf("\nUna tormenta te intercepto, pierdes es turno!");
+                    terreno.icon = ICON_PUNTO;//el jugador hace desaparecer la tormenta
+                    jugador->turno = NO;
+                    Sleep(5000);
                 }
+        break;
 
+        case ICON_OASIS:
+            terreno.icon = ICON_PUNTO;//el jugador hace desaparecer el oasis
+            jugador->proteccion = SI;
+        break;
 
-                break;
+        case ICON_PREMIO:
+            terreno.icon = ICON_PUNTO;
+            jugador->puntos++; //ajustar dependiendo de como funcione el sistema de puntos
+        break;
 
-            case ICON_OASIS:
-                j->proteccion = SI;
-                terreno->icon = ICON_PUNTO;//el jugador hace desaparecer el oasis?
-                break;
+        case ICON_VIDA:
+            terreno.icon = ICON_PUNTO;
+            jugador->vidas++;
+        break;
 
-            case ICON_PREMIO:
-                j->puntos++; //ajustar dependiendo de como funcione el sistema de puntos
-                terreno->icon = ICON_PUNTO;
-                break;
-
-            case ICON_VIDA:
-                j->vidas++;
-                terreno->icon = ICON_PUNTO;
-                break;
-
-            case ICON_SALIDA:
-                return EXITO;
-
+        case ICON_SALIDA:
+            return FIN_PARTIDA;
         }
 
-       // case ICON_SALIDA: considero agregar salida como variables
+    //actualizo el terreno en el mapa
+    modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
 
+    return TODO_OK;
+}
 
+int moverBandido(tBandido *bandido, tMovimiento *mov, unsigned turno)
+{
+    //muevo la posicion del bandido y actualizo sus casilleros
+    tIteradorCD itMapa;
+    tTerreno terreno;
 
+    //recupero terreno donde esta bandido
+    iniciarNodoItCD(&itMapa, bandido->posActual);
+    verActualItCD(&itMapa, &terreno, sizeof(terreno));
+
+    //le quito el bandido
+    terreno.bandidos -= 1;
+
+    //actualizo el terreno del mapa
+    modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
+
+    //MUEVO EL BANDIDO
+    bandido->posActual = mov->destino;
+    bandido->ultimoMov = mov->direccion;
+
+    //recupero el nuevo terreno donde esta el bandido
+    iniciarNodoItCD(&itMapa, bandido->posActual);
+    verActualItCD(&itMapa, &terreno, sizeof(terreno));
+
+    //le agrego el bandido y en q turno
+    terreno.bandidos += 1;
+    terreno.turnoActualizado = turno;
+
+    //actualizo el nuevo terreno del mapa
+    modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
+
+    return TODO_OK;
+}
+
+int colisionJugadorBandido(tIteradorLista *itBandidos, tLista *bGlobales, tBandido *bandido, tJugador *jugador, tListaCD *mapa, char protegido)
+{
+    tIteradorCD itMapa;
+    tTerreno terreno;
+
+    //recupero terreno del bandido
+    iniciarNodoItCD(&itMapa, bandido->posActual);
+    verActualItCD(&itMapa, &terreno, sizeof(terreno));
+
+    terreno.bandidos -= 1;
+
+    //guardo la modificacion
+    modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
+
+    //el bandido q estoy procesando lo elimino de la lista
+    eliminarActualItLista(itBandidos, bGlobales);
+
+    //q pasa con el juagdor?
+    if(protegido == NO)
+    {
+        //pierde 1 vida
+        jugador->vidas--;
+
+        //jugador se va de su casilla
+        iniciarNodoItCD(&itMapa, jugador->posActual);
+        verActualItCD(&itMapa, &terreno, sizeof(terreno));
+        terreno.jugador = 0;
+        modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
+
+        //juagador vuelve al incio
+        iniciarPrimeroItCD(&itMapa, mapa);
+        jugador->posActual = verNodoActualItCD(&itMapa);
+
+        //actualizar el terreno
+        verActualItCD(&itMapa, &terreno, sizeof(terreno));
+        terreno.jugador = 1;
+        modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
+
+        printf("\nperdiste una vida pero te cargaste al bandido!");
     }
     else
-        j->turno = SI;
+        printf("\nsobreviviste por la proteccion y te cargaste al bandido!");
 
-    bandidoN = (tBandido*)obtenerPrimeroInfo(bGlobales, &itInfoBand);
-    dirBandidoN = obtenerPrimerNodo(bGlobales, &itDirBand);
-    while(bandidoN != NULL)
-    {
-        sacarDeCola(colaMovimientos, &movArealizar, sizeof(tMovimiento));
+    Sleep(5000);
 
-        ///sacar bandido N de lista de casilla actual
-        terreno = (tTerreno*)bandidoN->posActual->info;
-        terreno->bandidos -= 1;
-
-        ///poner a bandido N de lista en casilla destino
-        bandidoN->posActual = movArealizar.destino;
-        terreno = (tTerreno*)bandidoN->posActual->info;
-        terreno->bandidos += 1;
-        terreno->turnoActualizado = turno;
-
-        bandidoN->ultimoMov = movArealizar.direccion;
-
-        //j->posActual->info->bandidos > 0
-        if(bandidoN->posActual == j->posActual)
-        {
-            //en una colison [B J] el bandido muere siempre
-            terreno->bandidos -= 1;
-            elimDirDeLista(bGlobales, dirBandidoN);
-
-            //q pasa con el jugador?
-            if(protegidoEsteTurno == NO)
-            {
-                j->vidas--;
-                j->posActual = *mapa;
-                terreno->jugador = 0;
-                ((tTerreno*)(*mapa)->info)->jugador = 1;
-                printf("\nperdiste una vida pero te cargaste al bandido!");
-            }
-            else
-            {
-                printf("\nsobreviviste por la proteccion y te cargaste al bandido!");
-            }
-
-            Sleep(5000);
-        }
-
-        bandidoN = (tBandido*)obtenerSiguienteInfo(&itInfoBand);
-        dirBandidoN = obtenerSiguienteNodo(&itDirBand);
-    }
-
-    return EXITO;
+    return TODO_OK;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-unsigned tirarDado()
-{
-    int num = rand()%6+1;
-    return num;
-}
-
-char iconoDeLinea(char* linea)
-{
-    //devuelvo el char luego de ':' en caravana txt
-    char *reg;
-    reg = strchr(linea, ':');
-
-    if(reg == NULL)
-        return ERROR_ARCHIVO;
-
-    return *(reg+1) == '[' ? *(reg+2) : *(reg+1);
-}
-
-int contarBandidosEnLinea(char* linea)
-{
-    int i = 0;
-    int cant = 0;
-
-    while(*(linea+i))
-    {
-        if(*(linea+i) == 'B')
-            cant++;
-
-        i++;
-    }
-
-    return cant;
-}
-
-void cargarMovJugador(tMovimiento *mov, tJugador *jugador)
-{
-    tNodo *posDestino;
-    unsigned numDado;
-    char direccion;
-    int puedeRetroceder;
-    char direccionRebote;
-
-    if(jugador->turno != SI)
-        return;
-
-    posDestino = jugador->posActual;
-    numDado = tirarDado();
-
-    printf("En el dado salio el numero: %u\n", numDado);
-
-    puedeRetroceder = posicionJugador(jugador) >= numDado;
-
-    puts("Desea Avanzar o Retroceder? (A/R)");
-
-    do
-    {
-        scanf(" %c", &direccion);
-        direccion = toupper(direccion);
-
-        //busco q la segunda sentencia del AND sea verdadera su no puede retroceder (solo avance)
-        if(direccion != 'A' && !(puedeRetroceder && direccion == 'R'))
-            puts("NO ES UNA OPCION VALIDA, REINGRESE");
-
-    }while(direccion != 'A' && !(puedeRetroceder && direccion == 'R'));
 
 
-    direccionRebote = direccion;
 
-    for(int i = 0; i < numDado; i++)
-        {
-            tTerreno* terrenoActual = (tTerreno*)posDestino->info;
 
-            if(direccionRebote == 'A')
-            {
-                if(terrenoActual->icon == ICON_SALIDA)
-                {
-                    direccionRebote = 'R';
-                    posDestino = posDestino->ant;
-                }
-                else
-                {
-                    posDestino = posDestino->sig;
-                }
-            }
-            else
-            {
-                posDestino = posDestino->ant;
-            }
-        }
 
-    mov->destino = posDestino;
-    mov->pasos = numDado;
-    mov->direccion = direccion;
-}
 
-int posicionJugador(tJugador* j)
-{
-    int i = 0;
 
-    tNodo* pos = j->posActual;   // rompe encapsulamiento esto?
 
-    tTerreno* terreno = (tTerreno*)pos->info;
 
-    while(terreno->icon != ICON_INICIO)
-    {
-        pos = pos->ant;
-        terreno = (tTerreno*)pos->info;
-        i++;
-    }
 
-    return i;
-}
-
-void cargarMovBandido(tMovimiento *mov, tBandido *bandido, unsigned turnoAc)
-{
-    IABandidos(mov, bandido, turnoAc);
-}
 
 
