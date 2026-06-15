@@ -41,7 +41,7 @@ int calcularTemperaturaMov(tBandido *bandido, tTerreno *terrenoAc, char sentido,
 int moverJugador(tJugador *jugador, tMovimiento *mov, char protegido);
 int moverBandido(tBandido *bandido, tMovimiento *mov, unsigned turno);
 int colisionJugadorBandido(tIteradorLista *itBandidos, tLista *bGlobales, tBandido *bandido, tJugador *jugador, tListaCD *mapa, char protegido);
-
+int despejarInicio(tLista *bGlobales, tListaCD *mapa, tJugador *jugador);
 
 
 int cargarMapa(tListaCD *mapa, tJugador *jugador, tLista *bGlobales)
@@ -76,6 +76,9 @@ void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigne
     cargarMovBandidos(mapa, bGlobales, &colaMovimientos, turno);
 
     realizarMovimientos(jugador, bGlobales, &colaMovimientos, mapa, turno);
+
+    //para q no hayan bandidos cuando jugador vuelva a inicio
+    despejarInicio(bGlobales, mapa, jugador);
 
     vaciarCola(&colaMovimientos);
 }
@@ -234,8 +237,8 @@ int realizarMovimientos(tJugador* jugador, tLista *bGlobales, tCola* colaMovimie
             else
                 avanzarItLista(&itBandidos);
 
-            //si un bandido murio y se saco de la pila
-            //ya se avanzo en la lista
+            //si un bandido murio y se saco de la lista
+            //ya se avanzo
         }
     }
 
@@ -315,7 +318,7 @@ char ingresoDireccionDeMov(tListaCD *mapa, tJugador *jugador, unsigned numDado)
 
 unsigned tirarDado()
 {
-    int num = rand()%6+1;
+    int num = rand()%Ns_DADO + 1;
     return num;
 }
 
@@ -336,8 +339,10 @@ int destinoDeJugador(tMovimiento *mov, tJugador *jugador, tListaCD *mapa, unsign
     tIteradorCD itMapa;
     char direccionRebote = direccion;
 
+    //inicio el movimiento en la casilla del juagador
     iniciarNodoItCD(&itMapa, jugador->posActual);
 
+    //calculo el destino tomando en cuenta el rebote de la salida
     for(int i = 0; i < numDado; i++)
     {
         verActualItCD(&itMapa, &terrDestino, sizeof(terrDestino));
@@ -356,6 +361,7 @@ int destinoDeJugador(tMovimiento *mov, tJugador *jugador, tListaCD *mapa, unsign
             retrocederItCD(&itMapa);
     }
 
+    //asigno el destino
     mov->destino = verNodoActualItCD(&itMapa);
     mov->pasos = numDado;
     mov->direccion = direccion;
@@ -642,11 +648,11 @@ int colisionJugadorBandido(tIteradorLista *itBandidos, tLista *bGlobales, tBandi
         terreno.jugador = 0;
         modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
 
-        //juagador vuelve al incio
+        //jugador vuelve al incio
         iniciarPrimeroItCD(&itMapa, mapa);
         jugador->posActual = verNodoActualItCD(&itMapa);
 
-        //actualizar el terreno
+        //recupero terreno de inicio y lo actualizo con jugador
         verActualItCD(&itMapa, &terreno, sizeof(terreno));
         terreno.jugador = 1;
         modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
@@ -661,15 +667,57 @@ int colisionJugadorBandido(tIteradorLista *itBandidos, tLista *bGlobales, tBandi
     return TODO_OK;
 }
 
+int despejarInicio(tLista *bGlobales, tListaCD *mapa, tJugador *jugador)
+{
+    //quito a todos los bandidos q puedan haber en el inicio
+    tIteradorLista itBandidos;
+    tIteradorCD itInicio, itMapa;
+    tBandido bandido;
+    tTerreno terreno;
 
+    iniciarPrimeroItCD(&itInicio, mapa);
 
+    //si el jugador no esta en inicio chau
+    if(jugador->posActual != verNodoActualItCD(&itInicio))
+        return TODO_OK;
 
+    if(iniciarPrimeroItLista(&itBandidos, bGlobales) != L_EXITO)
+        return TODO_OK;
 
+    //mientras itere en la lista de bandidos
+    while(esValidoItLista(&itBandidos))
+    {
+        verActualItLista(&itBandidos, &bandido, sizeof(bandido));
 
+        //muevo cada bandido q este en inicio
+        if(bandido.posActual == verNodoActualItCD(&itInicio))
+        {
+            unsigned pasos = tirarDado();
 
+            //quito bandido del inicio
+            iniciarNodoItCD(&itMapa, bandido.posActual);
+            verActualItCD(&itMapa, &terreno, sizeof(terreno));
+            terreno.bandidos -= 1;
+            modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
 
+            //mover n casillas hacia atrás
+            for(unsigned i = 0; i < pasos; i++)
+                retrocederItCD(&itMapa);
 
+            bandido.posActual = verNodoActualItCD(&itMapa);
 
+            //agrego bandido al nuevo terreno
+            verActualItCD(&itMapa, &terreno, sizeof(terreno));
+            terreno.bandidos += 1;
+            modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
 
+            //guardo cambios del bandido
+            modificarActualItLista(&itBandidos, &bandido, sizeof(bandido));
+        }
 
+        avanzarItLista(&itBandidos);
+    }
+
+    return TODO_OK;
+}
 

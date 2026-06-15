@@ -1,8 +1,12 @@
 #include "juego.h"
-#include "GRAFICOS/logica.h"
-#include "GRAFICOS/render.h"
-#include "funciones_ListaCircDoble.h"
-#include "funciones_listaDinamica.h"
+
+
+
+int iniciarPartida(int vidasInicio, FILE* archPartidas, int idJugador);
+int guardarPartida(FILE *archPartidas, int idJugador, const tJugador *jugador, unsigned turno);
+void mostrarResumenPartida(tLista *movimientos, int idJugador);
+int jugadorEnSalida(tJugador *jugador);
+void mostrarMovimientos(tLista* movimientos);
 
 
 
@@ -10,10 +14,9 @@
 int nuevaPartida(const char* nombreJugador, tArbolBinBusq *arbolIndices, FILE *archJugadores, FILE *archPartidas)
 {
     tTablero tablero;
-
     tJugadorIndice datosJugador;
 
-    ///procesamos al jugador antes de iniciar la partida
+    //procesamos al jugador antes de iniciar la partida
     //existe?lo buscamos, no existe? lo agregamos al arbol
     if (gestionarJugador(nombreJugador, arbolIndices, archJugadores, &datosJugador) != TODO_OK)
     {
@@ -21,83 +24,17 @@ int nuevaPartida(const char* nombreJugador, tArbolBinBusq *arbolIndices, FILE *a
         return ERROR_PARTIDA;
     }
 
-    ///validar q se haya creado un tablero valido
+    //validar q se haya creado un tablero valido
     if(generarTablero(&tablero, CARAVANA_ARCH) != TODO_OK)
     {
         puts("No se pudo generar el tablero...");
         return ERROR_PARTIDA;
     }
 
-    ///imprimir/crear tablero desde CARAVANA_ARCH!
+    //inicia el juego
     iniciarPartida(tablero.vidasInicio, archPartidas, datosJugador.id);
 
     return TODO_OK;
-}
-
-int iniciarPartida(int vidasInicio, FILE* archPartidas, int idJugador)
-{
-    ///durante el juego, siempre tener puntero a jugador y cada bandido
-    tListaCD mapa;
-    tJugador jugador = {.vidas = vidasInicio};
-    tLista bandidosGlobales;
-    tLista movimientos;
-    tPartida registroPartida;
-    unsigned turno = 0;
-
-    crearListaCD(&mapa);
-    crearLista(&bandidosGlobales);
-    crearLista(&movimientos);
-
-    ///cargo la listaCD, jugador y todos los bandidos
-    cargarMapa(&mapa, &jugador, &bandidosGlobales);
-
-    ///juego termina si jugador se queda sin vida o llega a la salida
-    while(jugador.vidas != 0 && ((tTerreno*)jugador.posActual->info)->icon != ICON_SALIDA)
-    {
-        renderizarPantalla(&mapa, jugador.vidas, jugador.proteccion, jugador.puntos, jugador.turno, turno);
-
-        procesarTurno(&mapa, &jugador, &bandidosGlobales, turno, &movimientos);
-
-        turno++;
-    }
-
-    registroPartida.idPartida = obtenerUltimoIdPartida(archPartidas) + 1;
-    registroPartida.idJugador = idJugador;//guardamos el id real
-
-    registroPartida.puntaje = jugador.puntos;
-    registroPartida.cantMovimientos = turno;
-    registroPartida.vidasRestantes = jugador.vidas;
-
-    //grabamos al final
-    fseek(archPartidas, 0, SEEK_END);
-    fwrite(&registroPartida, sizeof(tPartida), 1, archPartidas);
-
-    //forzamo buffer da
-    fflush(archPartidas);
-
-    printf("\n=========================================");
-    printf("\n MOVIMIENTOS REALIZADOS ");
-    printf("\n=========================================\n");
-    mostrarMovimientos(&movimientos);
-
-    printf("\npartida guardada para el jugador con id %d.\n", idJugador);
-
-
-    vaciarListaCD(&mapa);
-    vaciarLista(&bandidosGlobales);
-    vaciarLista(&movimientos);
-
-    return jugador.vidas ? SI : NO;
-}
-
-void mostrarMovimientos(tLista *movimientos)
-{
-    tMovimiento mov;
-
-    while(sacarPrimeroLista(movimientos, &mov, sizeof(mov)) == L_EXITO)
-        printf("%c%u  ", mov.direccion == AVANZAR ? 'F' : 'B', mov.pasos);
-
-    putchar('\n');
 }
 
 void mostrarReglas()
@@ -178,5 +115,99 @@ void mostrarReglas()
 
     puts("\nPresione cualquier tecla para volver al menu...");
     getch();
+}
+
+///SUB-PROCESOS///
+
+int iniciarPartida(int vidasInicio, FILE* archPartidas, int idJugador)
+{
+    //durante el juego, siempre tener puntero a jugador y cada bandido
+    tListaCD mapa;
+    tJugador jugador = {.vidas = vidasInicio};
+    tLista bandidosGlobales;
+    tLista movimientos;
+    unsigned turno = 0;
+
+    crearListaCD(&mapa);
+    crearLista(&bandidosGlobales);
+    crearLista(&movimientos);
+
+    //cargo la listaCD, jugador y todos los bandidos
+    cargarMapa(&mapa, &jugador, &bandidosGlobales);
+
+    //juego termina si jugador se queda sin vida o llega a la salida
+    while(jugador.vidas != 0 && !jugadorEnSalida(&jugador))
+    {
+        renderizarPantalla(&mapa, jugador.vidas, jugador.proteccion, jugador.puntos, jugador.turno, turno);
+
+        procesarTurno(&mapa, &jugador, &bandidosGlobales, turno, &movimientos);
+
+        turno++;
+    }
+
+    guardarPartida(archPartidas, idJugador, &jugador, turno);
+
+    mostrarResumenPartida(&movimientos, idJugador);
+
+    vaciarListaCD(&mapa);
+    vaciarLista(&bandidosGlobales);
+    vaciarLista(&movimientos);
+
+    return jugador.vidas ? SI : NO;
+}
+
+int guardarPartida(FILE *archPartidas, int idJugador, const tJugador *jugador, unsigned turno)
+{
+    tPartida registroPartida;
+
+    registroPartida.idPartida = obtenerUltimoIdPartida(archPartidas) + 1;
+    registroPartida.idJugador = idJugador; //guardamos el id real
+
+    registroPartida.puntaje = jugador->puntos;
+    registroPartida.cantMovimientos = turno;
+    registroPartida.vidasRestantes = jugador->vidas;
+
+    //grabamos al final
+    fseek(archPartidas, 0, SEEK_END);
+    fwrite(&registroPartida, sizeof(tPartida), 1, archPartidas);
+
+    //forzamo buffer da
+    fflush(archPartidas);
+
+    return TODO_OK;
+}
+
+void mostrarResumenPartida(tLista *movimientos, int idJugador)
+{
+    printf("\n=========================================");
+    printf("\n       MOVIMIENTOS REALIZADOS ");
+    printf("\n=========================================\n");
+
+    mostrarMovimientos(movimientos);
+
+    printf("\npartida guardada para el jugador con id %d.\n", idJugador);
+}
+
+///HELPERS///
+
+int jugadorEnSalida(tJugador *jugador)
+{
+    tIteradorCD it;
+    tTerreno terreno;
+
+    iniciarNodoItCD(&it, jugador->posActual);
+    verActualItCD(&it, &terreno, sizeof(terreno));
+
+    return terreno.icon == ICON_SALIDA;
+}
+
+void mostrarMovimientos(tLista *movimientos)
+{
+    tMovimiento mov;
+
+    while(sacarPrimeroLista(movimientos, &mov, sizeof(mov)) == L_EXITO)
+        printf("%c%u  ", mov.direccion == AVANZAR ? 'F' : 'B', mov.pasos);
+
+    putchar('\n');
 }
 

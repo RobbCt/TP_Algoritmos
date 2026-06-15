@@ -13,11 +13,12 @@
 #include "arbolBB.h"
 #include "gestionDatos.h"
 #include "funciones_listaDinamica.h"
+#include "GRAFICOS/logica.h"
+#include "GRAFICOS/render.h"
+#include "funciones_ListaCircDoble.h"
+
 
 void mostrarReglas();
-int nuevaPartida(const char* nombreJugador, tArbolBinBusq *arbolIndices,
-                 FILE *archJugadores,FILE *archPartidas);
-int iniciarPartida(int vidasInicio, FILE* archPartidas, int idJugador);
-void mostrarMovimientos(tLista* movimientos);
+int nuevaPartida(const char* nombreJugador, tArbolBinBusq *arbolIndices, FILE *archJugadores,FILE *archPartidas);
 
 #endif // JUEGO_H_INCLUDED

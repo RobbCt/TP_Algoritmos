@@ -58,9 +58,9 @@
 
 1778259772 c:\users\rober\desktop\tp-algo\tp_caravana\tipos.h
 
-1781484994 c:\users\rober\desktop\tp-algo\tp_caravana\constantes.h
+1781494203 c:\users\rober\desktop\tp-algo\tp_caravana\constantes.h
 
-1781489624 source:c:\users\rober\desktop\tp-algo\tp_caravana\juego.c
+1781499014 source:c:\users\rober\desktop\tp-algo\tp_caravana\juego.c
 	"juego.h"
 	"GRAFICOS/logica.h"
 	"GRAFICOS/render.h"
@@ -111,7 +111,7 @@
 	"../funciones_ListaCircDoble.h"
 	"../constantes.h"
 
-1781490389 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.c
+1781497469 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.c
 	"logica.h"
 
 1781459323 c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.h

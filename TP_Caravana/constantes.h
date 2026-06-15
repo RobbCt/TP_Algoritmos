@@ -50,5 +50,6 @@
 #define NO          'N'
 #define AVANZAR     'A'
 #define RETROCEDER  'R'
+#define Ns_DADO      6
 
 #endif // CONSTANTES_H_INCLUDED
