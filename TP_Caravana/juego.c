@@ -54,7 +54,7 @@ void mostrarReglas()
     puts("  S : Ciudad Refugio");
     puts("  J : Jugador");
     puts("  B : Bandido");
-    puts("  P : Premio (+1 punto)");
+    puts("  P : Premio (+25 puntos)");
     puts("  V : Vida Extra (+1 vida)");
     puts("  O : Oasis (proteccion temporal)");
     puts("  T : Tormenta de arena");
@@ -94,7 +94,18 @@ void mostrarReglas()
     puts("- Si estabas protegido por un oasis, no pierdes");
     puts("  la vida y consumes la proteccion.\n");
 
+
+    puts("PUNTUACION");
+    puts("- Llegar a la Ciudad Refugio: +100 puntos.");
+    puts("- Recoger un Premio (P): +25 puntos.");
+    puts("- Obtener una Vida Extra (V): +10 puntos.");
+    puts("- Eliminar un Bandido: +15 puntos.");
+    puts("- Perder una vida: -10 puntos.");
+    puts("- Conservar vidas al finalizar la partida: +20");
+    puts("  puntos por cada vida restante.\n");
+
     puts("CARACTERISTICAS");
+    puts("- Cada accion importante suma o resta puntos; llegar a la Ciudad Refugio es la mayor recompensa.");
     puts("- Puede haber varios bandidos en una misma posicion.");
     puts("- Los bandidos intentan rastrear al jugador utilizando");
     puts("  informacion de los movimientos recientes.");

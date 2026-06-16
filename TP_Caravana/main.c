@@ -28,13 +28,13 @@ int main()
     do
     {
         puts("\nCARAVANA DEL DESIERTO");
-        puts("Seleccione una opcion...");
+        printf("Seleccione una opci%cn...\n", 162);
         puts("1- Nueva Partida");
-        puts("2- Como se juega?");
+        printf("2- %cC%cmo se juega?\n",168, 162);
         puts("3- Rankings");
         puts("4- Salir");
 
-        printf("Opcion: ");
+        printf("Opci%cn: ", 162);
         scanf("%d", &opc);
 
         int c;
@@ -61,7 +61,7 @@ int main()
                 system("pause");
                 break;
             default:
-                puts("Opcion invalida, reingrese...");
+                printf("Opci%cn inv%clida, reingrese...\n", 162,160);
                 system("pause");
                 break;
         }
