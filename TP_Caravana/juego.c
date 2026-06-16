@@ -11,7 +11,7 @@ int nuevaPartida(const char* nombreJugador, tArbolBinBusq*arbolIndices, FILE*arc
 {
     tTablero tablero;
 
-    tJugadorIndice datosJugador;
+    tJugadorDatos datosJugador;
 
     ///procesamos al jug antes de iniciar la partida
     //existe?lo buscamos, no existe? lo agregamos al arbol

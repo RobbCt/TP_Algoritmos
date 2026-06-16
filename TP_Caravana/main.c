@@ -43,6 +43,7 @@ int main()
             case 1:
                 printf("Ingrese su nombre:");
                 fgets(nombre, TAM_NOMBRE, stdin);
+                nombre[strcspn(nombre, "\n")] = '\0';
                 nuevaPartida(nombre, &arbolIdx, archJugadores, archPartidas);
                 system("pause");
                 break;

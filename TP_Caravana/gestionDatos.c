@@ -1,35 +1,76 @@
 #include "gestionDatos.h"
 
-
 int buscarJugadorPorNombre(const char* nombre, const tArbolBinBusq* arbolIdx,
-                           FILE* archJugadores, tJugadorIndice* jugadorClon)
-
+                           FILE* archJugadores, tJugadorDatos* jugadorClon)
 {
-    //clave-offset
-    tRegIndice* registroIndice;
+    tNombreRepetido jugadoresEncontrados;
 
-    registroIndice= (tRegIndice*)buscarEnArbol(arbolIdx, nombre, cmpPorNombre);
+    // lista temporal
+    crearLista(&jugadoresEncontrados.listaAlias);
+    jugadoresEncontrados.cantidad = 0; // Inicializar el contador
+    printf("\nBuscando el nombre '%s' en el sistema...\n", nombre);
 
-    if (!registroIndice)
+    recorrerArbolFiltradoInOrden(arbolIdx, (void*)nombre, cmpIndiceConNombre, mostrarYGuardarEnLista, &jugadoresEncontrados);
+
+    if (jugadoresEncontrados.cantidad == 0)
         return NO_EXISTE;
 
-    //si existe, usamos nroReg(guarda la pos en bytes) para ir directo en el arch
-    fseek(archJugadores, registroIndice->nroRegistro, SEEK_SET);
-    fread(jugadorClon, sizeof(tJugadorIndice), 1, archJugadores);
+    return seleccionarYRecuperarJugador(&jugadoresEncontrados, archJugadores, jugadorClon);
+}
+int seleccionarYRecuperarJugador(tNombreRepetido* jugadoresEncontrados, FILE* archJugadores, tJugadorDatos* jugadorClon)
+{
+    int opcion;
+    tRegIndice* registroElegido;
+    printf(" [%d] Ninguno de los anteriores (Crear un alias nuevo)\n", jugadoresEncontrados->cantidad + 1);
+
+    do {
+        printf("\nSeleccione su opcion: ");
+        scanf("%d", &opcion);
+    } while (opcion < 1 || opcion> jugadoresEncontrados->cantidad + 1);
+
+    if (opcion == jugadoresEncontrados->cantidad + 1)
+    {
+        vaciarLista(&(jugadoresEncontrados->listaAlias));
+        return NO_EXISTE;
+    }
+
+    registroElegido= (tRegIndice*)buscarPorPosicionLista(&(jugadoresEncontrados)->listaAlias, opcion);
+
+    if (registroElegido)
+    {
+        fseek(archJugadores, registroElegido->nroRegistro, SEEK_SET);
+        fread(jugadorClon, sizeof(tJugadorDatos), 1, archJugadores);
+    }
+
+    vaciarLista(&(jugadoresEncontrados->listaAlias));
 
     return TODO_OK;
 }
 
-int crearJugador(const char* nombre, tArbolBinBusq* arbolIdx,
-                 FILE* archJugadores, tJugadorIndice* nuevoJugador)
+void mostrarYGuardarEnLista(const void *infoNodo, void *param)
+{
+    const tRegIndice *reg = (const tRegIndice *)infoNodo;
+    tNombreRepetido *jEncontrados = (tNombreRepetido *)param;
 
+    ponerAlFinal(&(jEncontrados->listaAlias), reg, sizeof(tRegIndice));
+
+    jEncontrados->cantidad++;
+    printf(" [%d] Alias: %s\n", jEncontrados->cantidad, reg->alias);
+}
+
+int crearJugador(const char* nombre, tArbolBinBusq* arbolIdx,
+                 FILE* archJugadores, tJugadorDatos* nuevoJugador)
 {
     tRegIndice nuevoNodoIndice;
+    char alias[30];
     int nuevoId = obtenerUltimoIdJugador(archJugadores) + 1;
+
+    generarAliasUnico(nombre, arbolIdx, alias);
 
     //armamos la estructura del jugador q va al arch de datos
     nuevoJugador->id = nuevoId;
     strcpy(nuevoJugador->nombre, nombre);
+    strcpy(nuevoJugador->alias, alias);
 
     fseek(archJugadores, 0, SEEK_END);//pal append
 
@@ -38,18 +79,19 @@ int crearJugador(const char* nombre, tArbolBinBusq* arbolIdx,
     //q esjusto el byte donde se escribe el nuejug
     nuevoNodoIndice.nroRegistro = ftell(archJugadores);
     strcpy(nuevoNodoIndice.nombreJugador, nombre);
+    strcpy(nuevoNodoIndice.alias, alias);
 
-    if (fwrite(nuevoJugador, sizeof(tJugadorIndice), 1, archJugadores) != 1)
+    if (fwrite(nuevoJugador, sizeof(tJugadorDatos), 1, archJugadores) != 1)
         return ERROR_ARCH;
 
     //insertamos clave+nroreg
-    if (insertarEnArbol(arbolIdx, &nuevoNodoIndice, sizeof(tRegIndice),cmpPorNombre) != TODO_OK)
+    if (insertarEnArbol(arbolIdx, &nuevoNodoIndice, sizeof(tRegIndice),cmpPorClaveCompleta) != TODO_OK)
         return ERROR_ARBOL;
 
     return TODO_OK;
 
 }
-int gestionarJugador(const char* nombreIngresado, tArbolBinBusq* arbolIdx, FILE* archJugadores, tJugadorIndice* jugadorDeLaPartida)
+int gestionarJugador(const char* nombreIngresado, tArbolBinBusq* arbolIdx, FILE* archJugadores, tJugadorDatos* jugadorDeLaPartida)
 {
     int estado= buscarJugadorPorNombre(nombreIngresado, arbolIdx, archJugadores, jugadorDeLaPartida);
 
@@ -73,7 +115,7 @@ int cargarIdxDesdeArch(tArbolBinBusq* arbolIdx, const char* nombreArchIdx)
     rewind(archIdx);
 
     while(fread(&reg, sizeof(tRegIndice), 1, archIdx))
-        insertarEnArbol(arbolIdx, &reg, sizeof(tRegIndice), cmpPorNombre);
+        insertarEnArbol(arbolIdx, &reg, sizeof(tRegIndice), cmpPorClaveCompleta);
 
     fclose(archIdx);
     return TODO_OK;
@@ -100,25 +142,36 @@ int guardarIdxEnArch(tArbolBinBusq* arbolIdx, const char* nombreArchIdx)
 }
 
 ///cmp's¿
-int cmpPorNombre(const void* a, const void* b)
+int cmpPorClaveCompleta(const void* a, const void* b)///
 {
-    const tRegIndice* regA = (const tRegIndice*)a;
-    const tRegIndice* regB = (const tRegIndice*)b;
+    const tRegIndice* regA= (const tRegIndice*)a;
+    const tRegIndice* regB= (const tRegIndice*)b;
 
-    return strcmp(regA->nombreJugador, regB->nombreJugador);
+    int cmp= strcmp(regA->nombreJugador, regB->nombreJugador);
+
+    if(cmp!= 0)
+        return cmp;
+
+    return strcmp(regA->alias,regB->alias);
 }
+int cmpIndiceConNombre(const void* infoNodo, const void* info)
+{
+    const tRegIndice* reg= infoNodo;
+    const char* nombre= info;
 
+    return strcmp(reg->nombreJugador, nombre);
+}
 ///aux's de id
 //pa poder generar el sig id
 int obtenerUltimoIdJugador(FILE* archJugadores)
 {
-    tJugadorIndice ultJugador;
+    tJugadorDatos ultJugador;
     long tamArchivo,cantRegistros;
 
     //calculamos el tam en bytespara obtener la cant de regs
     fseek(archJugadores, 0, SEEK_END);
     tamArchivo = ftell(archJugadores);
-    cantRegistros = tamArchivo / sizeof(tJugadorIndice);
+    cantRegistros = tamArchivo / sizeof(tJugadorDatos);
 
     //si no hay regs, se setea el 1er id como 0
     if(cantRegistros==0)
@@ -126,10 +179,10 @@ int obtenerUltimoIdJugador(FILE* archJugadores)
 
     //nos vamos al inicio del ult reg
     //ej: si tenemos 5 regs, saltamos 4 regs [0 1 2 3] y leemos el 5to [4]
-    fseek(archJugadores, (cantRegistros-1)*sizeof(tJugadorIndice), SEEK_SET);
+    fseek(archJugadores, (cantRegistros-1)*sizeof(tJugadorDatos), SEEK_SET);
 
     //si falla la lectura del ult reg, asumimos id 0¿
-    if (fread(&ultJugador, sizeof(tJugadorIndice), 1, archJugadores)!= 1)
+    if (fread(&ultJugador, sizeof(tJugadorDatos), 1, archJugadores)!= 1)
         return 0;
 
     //dejamos p al final listo pa escribir
@@ -155,4 +208,33 @@ int obtenerUltimoIdPartida(FILE* archPartidas)
         return 0;
 
     return ultPartida.idPartida;
+}
+
+
+int existeAlias(const tArbolBinBusq* arbolIdx, const char* nombre, const char* alias)
+{
+    tRegIndice clave;
+
+    strcpy(clave.nombreJugador, nombre);
+    strcpy(clave.alias, alias);
+
+    return buscarEnArbol(arbolIdx, &clave, cmpPorClaveCompleta)!= NULL;
+}
+
+void generarAliasUnico(const char* nombre,  const tArbolBinBusq* arbolIdx, char* aliasGenerado)
+{
+    char nombreBase[30];
+    int i = 1;
+
+    strcpy(nombreBase, nombre);
+
+    for(int j= 0; nombreBase[j]; j++)
+        nombreBase[j] = tolower(nombreBase[j]);
+
+    do
+    {
+        sprintf(aliasGenerado,"%s%02d",nombreBase, i);
+        i++;
+
+    } while(existeAlias(arbolIdx,nombre,aliasGenerado));
 }

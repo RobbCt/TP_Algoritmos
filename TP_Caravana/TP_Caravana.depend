@@ -149,7 +149,7 @@
 
 1780077571 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\tipos.h
 
-1780427766 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\constantes.h
+1781490996 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\constantes.h
 
 1780077571 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\funciones_listacircdoble.c
 	"funciones_ListaCircDoble.h"
@@ -158,59 +158,75 @@
 	<stdlib.h>
 	<string.h>
 
-1780077571 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\funciones_listadinamica.c
+1781537770 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\funciones_listadinamica.c
 	"funciones_listaDinamica.h"
+	<stdio.h>
 
-1780077571 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\funciones_listadinamica.h
+1781537698 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\funciones_listadinamica.h
 	<stdlib.h>
 	<string.h>
 
-1780077571 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\graficos\logica.c
-	"../constantes.h"
+1781491183 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\graficos\logica.c
 	"logica.h"
 
-1780430925 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\graficos\logica.h
+1781549482 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\graficos\logica.h
 	<stdio.h>
+	<ctype.h>
+	<windows.h>
+	"../constantes.h"
+	"../funciones_colaDinamica.h"
 	"../funciones_ListaCircDoble.h"
+	"../funciones_listaDinamica.h"
 
-1780077571 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\graficos\render.c
+1781451850 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\graficos\render.c
 	"render.h"
 	"logica.h"
 
-1780077571 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\graficos\render.h
+1781292404 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\graficos\render.h
 	<stdio.h>
+	<string.h>
 	"../funciones_ListaCircDoble.h"
+	"../constantes.h"
 
-1780430434 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\juego.c
+1781549194 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\juego.c
 	"juego.h"
 	"GRAFICOS/logica.h"
 	"GRAFICOS/render.h"
 	"funciones_ListaCircDoble.h"
+	"funciones_listaDinamica.h"
 
-1780430435 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\juego.h
+1781451850 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\juego.h
 	<stdio.h>
 	<stdlib.h>
 	<time.h>
+	<conio.h>
 	"tipos.h"
 	"tablero.h"
 	"constantes.h"
 	"ranking.h"
+	"arbolBB.h"
+	"gestionDatos.h"
+	"funciones_listaDinamica.h"
 
-1780077571 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\tablero.h
+1781451850 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\tablero.h
 	"tipos.h"
 	"constantes.h"
 	"config.h"
 
-1780432313 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\ranking.h
+1781292404 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\ranking.h
 	"config.h"
+	"gestionDatos.h"
+	"TDAvector.h"
 
-1780077571 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\main.c
+1781566501 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\main.c
 	"juego.h"
+	"arbolBB.h"
+	"gestionDatos.h"
 
-1780432313 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\ranking.c
+1781548933 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\ranking.c
 	"ranking.h"
 
-1780077571 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\tablero.c
+1781451850 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\tablero.c
 	"tablero.h"
 
 1780327747 source:c:\users\hered\onedrive\desktop\tp_algoritmos\tp_caravana\funciones_listacircdoble.c
@@ -329,5 +345,40 @@
 	"ranking.h"
 
 1781143818 source:c:\users\rober\desktop\tp-algo\tp_caravana\tdavector.c
+	"TDAvector.h"
+
+1781566357 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\arbolbb.c
+	"arbolBB.h"
+
+1781566296 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\arbolbb.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"config.h"
+
+1781292404 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\funciones_coladinamica.c
+	"funciones_colaDinamica.h"
+
+1781292404 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\funciones_coladinamica.h
+	<stdlib.h>
+	<string.h>
+
+1781566764 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\gestiondatos.c
+	"gestionDatos.h"
+
+1781566764 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\gestiondatos.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"arbolBB.h"
+	"constantes.h"
+	"funciones_listaDinamica.h"
+
+1781292404 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\tdavector.h
+	"config.h"
+
+1781292404 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\tdavector.c
 	"TDAvector.h"
 

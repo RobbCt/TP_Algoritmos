@@ -41,8 +41,30 @@ void recorrerPreOrdenRecArbolBinBusq(const tArbolBinBusq*p, unsigned n, void* pa
     recorrerPreOrdenRecArbolBinBusq(&(*p)->izq, n+1, params, accion);
     recorrerPreOrdenRecArbolBinBusq(&(*p)->der, n+1, params, accion);
 }
+void recorrerInOrdenRecArbolBinBusq(const tArbolBinBusq*p, unsigned n, void* params,
+                                     void(*accion)(void*,unsigned, unsigned, void*))
+{
+    if(!*p)
+        return ;
+    recorrerInOrdenRecArbolBinBusq(&(*p)->izq, n+1, params, accion);
+    accion((*p)->info,(*p)->tamInfo, n, params);
+    recorrerInOrdenRecArbolBinBusq(&(*p)->der, n+1, params, accion);
+}
 
+//  invoca a accion solo si cmp es verdadero
+void recorrerArbolFiltradoInOrden(const tArbolBinBusq *p, void *info,
+                           int (*cmp)(const void *, const void *),
+                           void (*accion)(const void *, void *),void *param)
+{
+    if (!*p)
+        return;
+    recorrerArbolFiltradoInOrden(&(*p)->izq, info, cmp, accion, param);
 
+    if (cmp((*p)->info, info)==0)
+        accion((*p)->info, param);
+
+    recorrerArbolFiltradoInOrden(&(*p)->der, info, cmp, accion, param);
+}
 void* buscarEnArbol(const tArbolBinBusq* p, const void* claveBuscada,
                     int (*cmp)(const void*, const void*))
 {

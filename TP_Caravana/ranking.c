@@ -9,7 +9,7 @@ int verRanking(FILE* archJugadores, FILE* archPartidas)
 
     ///ver cantidad de jugadores
     fseek(archJugadores,0,SEEK_END);
-    cantJugadores= ftell(archJugadores)/sizeof(tJugadorIndice);
+    cantJugadores= ftell(archJugadores)/sizeof(tJugadorDatos);
 
     if(cantJugadores==0)
         return SIN_JUGADOR;

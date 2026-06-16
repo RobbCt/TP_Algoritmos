@@ -548,3 +548,10 @@ void cargarMovBandido(tMovimiento *mov, tBandido *bandido, unsigned turnoAc)
 }
 
 
+
+
+void otorgarPuntosVictoria(tJugador* jugador)
+{
+    //if(jugador->vidas > 0)
+        jugador->puntos += PUNTOS_VICTORIA;
+}

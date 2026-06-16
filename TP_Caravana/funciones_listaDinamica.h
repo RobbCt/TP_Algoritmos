@@ -59,4 +59,6 @@ tNodoL* obtenerSiguienteNodo(tIteradorLista *it);
 
 int elimDirDeLista(tLista *p, const void *d);
 
+void* buscarPorPosicionLista(tLista* p, int posicion);
+
 #endif // FUNCIONES_LISTADINAMICA_H_INCLUDED

@@ -40,4 +40,9 @@ void* buscarEnArbol(const tArbolBinBusq* p, const void* claveBuscada,
 
 void recorrerPreOrdenRecArbolBinBusq(const tArbolBinBusq*p, unsigned n, void* params,
                                      void(*accion)(void*,unsigned, unsigned, void*));
+void recorrerInOrdenRecArbolBinBusq(const tArbolBinBusq*p, unsigned n, void* params,
+                                     void(*accion)(void*,unsigned, unsigned, void*));
+void recorrerArbolFiltradoInOrden(const tArbolBinBusq *pa, void *datosBuscar,
+                           int (*cmp)(const void *, const void *),
+                           void (*accion)(const void *, void *),void *param);
 #endif // ARBOLBB_H_INCLUDED

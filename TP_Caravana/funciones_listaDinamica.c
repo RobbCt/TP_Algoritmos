@@ -220,3 +220,14 @@ int elimDirDeLista(tLista *p, const void *d)
 
     return EXITO;
 }
+
+void* buscarPorPosicionLista(tLista* p, int posicion)
+{
+    int i= 1;
+    while (*p && i < posicion)
+    {
+        p = &(*p)->sig;
+        i++;
+    }
+    return *p? (*p)->info: NULL;
+}

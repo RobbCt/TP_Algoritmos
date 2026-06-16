@@ -50,4 +50,7 @@
 #define AVANZAR     'A'
 #define RETROCEDER  'R'
 
+//puntos extra
+#define PUNTOS_VICTORIA 50
+
 #endif // CONSTANTES_H_INCLUDED
