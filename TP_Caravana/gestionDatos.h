@@ -4,15 +4,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "arbolBB.h"
 #include "constantes.h"
+#include "funciones_listaDinamica.h"
 
 typedef struct
 {
     int id;
-    char nombre[30];
-} tJugadorIndice; //jugadores.dat
+    char nombre[30]; //nombre real ingresado
+    char alias[30]; // identificador único
+} tJugadorDatos; //jugadores.dat
 
 typedef struct
 {
@@ -27,23 +30,38 @@ typedef struct
 typedef struct
 {
     char nombreJugador[30]; //clave por la q se ordena y busca en el abb
+    char alias[30];
     long nroRegistro; //mi offset muak
 } tRegIndice; //.idx
 
+typedef struct
+{
+    tLista listaAlias;   // lista de alias
+    int cantidad;     //cuántos alias hay
+} tNombreRepetido;
+
+
 int buscarJugadorPorNombre(const char* nombre, const tArbolBinBusq* arbolIdx,
-                           FILE* archJugadores, tJugadorIndice* jugadorClon);
+                           FILE* archJugadores, tJugadorDatos* jugadorClon);
+int seleccionarYRecuperarJugador(tNombreRepetido* jugadoresEncontrados,
+                                 FILE* archJugadores, tJugadorDatos* jugadorClon);
+
 int crearJugador(const char* nombre, tArbolBinBusq* arbolIdx,
-                 FILE* archJugadores, tJugadorIndice* nuevoJugador);
+                 FILE* archJugadores, tJugadorDatos* nuevoJugador);
 int gestionarJugador(const char* nombreIngresado, tArbolBinBusq* arbolIdx,
-                     FILE* archJugadores, tJugadorIndice* jugadorDeLaPartida);
+                     FILE* archJugadores, tJugadorDatos* jugadorDeLaPartida);
 
 int cargarIdxDesdeArch(tArbolBinBusq* arbolIdx, const char* nombreArchivoIndice);
 void escribirNodoEnArch(void* elem, unsigned tam, unsigned nivel, void* param);
 int cargarIdxDesdeArch(tArbolBinBusq* arbolIdx, const char* nombreArchivoIndice);
 int guardarIdxEnArch(tArbolBinBusq* arbolIdx, const char* nombreArchIdx);
 
-int cmpPorNombre(const void* a, const void* b);
+int cmpPorClaveCompleta(const void* a, const void* b);
+int cmpIndiceConNombre(const void* infoNodo, const void* info);
+void mostrarYGuardarEnLista(const void *infoNodo, void *param);//accion
+
 int obtenerUltimoIdJugador(FILE* archJugadores);
 int obtenerUltimoIdPartida(FILE* archPartidas);
+void generarAliasUnico(const char* nombre,  const tArbolBinBusq* arbolIdx, char* aliasGenerado);
 
 #endif // GESTIONDATOS_H_INCLUDED

@@ -229,6 +229,18 @@ int eliminarActualItLista(tIteradorLista *it, tLista *p)
     return L_EXITO;
 }
 
+
+void* buscarPorPosicionLista(tLista* p, int posicion)
+{
+    int i= 1;
+    while (*p && i < posicion)
+    {
+        p = &(*p)->sig;
+        i++;
+    }
+    return *p? (*p)->info: NULL;
+}
+
 int esValidoItLista(const tIteradorLista *it)
 {
     return it && it->actual != NULL;
@@ -242,5 +254,3 @@ void reiniciarItLista(tIteradorLista *it)
     it->actual = NULL;
     it->posicion = 0;
 }
-
-

@@ -243,6 +243,23 @@ void mostrarListaCD(const tListaCD *p, tMostrar mostrar)
     }
 }
 
+void mostrarLista2CD(const tListaCD *p, tAccion accion, void *contexto)
+{
+    tNodoCD *pri, *act;
+
+    if(*p != NULL)
+    {
+        act = pri = *p;
+
+        do
+        {
+            accion(act->info, contexto);
+            act = act->sig;
+
+        }while(act != pri);
+    }
+}
+
 tNodoCD* obtenerPrimerNodoListaCD(const tListaCD *p)//cargarTerrenoInicioDesdeArch
 {
     //*p apunta al primer nodo

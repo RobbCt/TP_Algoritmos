@@ -32,6 +32,8 @@ typedef int (*tCmp)(const void*, const void*);
 
 typedef void (*tMostrar)(const void*);
 
+typedef void (*tAccion)(void *info, void *contexto);
+
 ///PRIMITIVAS
 
 void crearListaCD(tListaCD *p);
@@ -55,6 +57,8 @@ int sacarUltimoListaCD(tListaCD *p, void *d, unsigned tamBytes);
 int verUltimoListaCD(const tListaCD *p, void *d, unsigned tamBytes);
 
 void mostrarListaCD(const tListaCD *p, tMostrar mostrar);
+
+void mostrarLista2CD(const tListaCD *p, tAccion accion, void *contexto);
 
 tNodoCD* obtenerPrimerNodoListaCD(const tListaCD *lista);
 

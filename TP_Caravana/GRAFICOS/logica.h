@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <windows.h>
+#include "render.h"
 #include "../constantes.h"
 #include "../funciones_colaDinamica.h"
 #include "../funciones_ListaCircDoble.h"
@@ -22,7 +23,7 @@ typedef struct
     char proteccion;          //tiene proteccion? SI, NO
     char turno;               //puede jugar?      SI, NO
     unsigned vidas;           //vidas restantes?  gano, perdio
-    unsigned puntos;
+    int puntos;
     tNodoCD *posActual;
 }tJugador;
 

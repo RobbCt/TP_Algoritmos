@@ -42,6 +42,9 @@ int moverJugador(tJugador *jugador, tMovimiento *mov, char protegido);
 int moverBandido(tBandido *bandido, tMovimiento *mov, unsigned turno);
 int colisionJugadorBandido(tIteradorLista *itBandidos, tLista *bGlobales, tBandido *bandido, tJugador *jugador, tListaCD *mapa, char protegido);
 int despejarInicio(tLista *bGlobales, tListaCD *mapa, tJugador *jugador);
+int resolverTerrenoJugador(tJugador *jugador, tListaCD *mapa, char protegido);
+char hayEvento(tJugador *jugador, tListaCD *mapa,tLista *bGlobales);
+
 
 
 int cargarMapa(tListaCD *mapa, tJugador *jugador, tLista *bGlobales)
@@ -163,7 +166,7 @@ int cargarMovJugador(tListaCD *mapa, tJugador *jugador, tCola *colaMov, tLista *
     if(jugador->turno == NO)
     {
         puts("La tormenta te atrapo, pierdes un turno!");
-        //Sleep(5000);
+        //Sleep(T_PANTALLA);
         return TODO_OK;
     }
 
@@ -213,32 +216,54 @@ int realizarMovimientos(tJugador* jugador, tLista *bGlobales, tCola* colaMovimie
 
     jugador->proteccion = NO;//para que la proteccion solo dure un turno
 
+    //muevo jugador
     sacarDeCola(colaMovimientos, &movArealizar, sizeof(movArealizar));
+    moverJugador(jugador, &movArealizar, protegidoEsteTurno);
 
-    if(moverJugador(jugador, &movArealizar, protegidoEsteTurno) == FIN_PARTIDA)
-        return TODO_OK;
 
-    //mover a cada bandido de la lista bGlobales (si hay movimientos)
+    //muevo cada bandido de la lista bGlobales (si hay movimientos o bandidos)
     if(iniciarPrimeroItLista(&itBandidos, bGlobales) == L_EXITO)
     {
-
         while(esValidoItLista(&itBandidos))
         {
             sacarDeCola(colaMovimientos, &movArealizar, sizeof(tMovimiento));
 
             //recupero un bandido de lista y lo actualizo (lo muevo)
             verActualItLista(&itBandidos, &bandido, sizeof(bandido));
+
             moverBandido(&bandido, &movArealizar, turno);
             modificarActualItLista(&itBandidos, &bandido, sizeof(bandido));
 
+            avanzarItLista(&itBandidos);
+        }
+    }
+
+    //resuelvo colision jugador x items
+    if(hayEvento(jugador, mapa, bGlobales) == SI)
+    {
+        //frame itermedio
+        renderizarPantalla(mapa, jugador->vidas, jugador->proteccion, jugador->puntos, jugador->turno, turno);
+
+        if(resolverTerrenoJugador(jugador, mapa, protegidoEsteTurno) == FIN_PARTIDA)
+            return TODO_OK;
+    }
+
+    //resuelvo colision jugador x bandido
+    if(iniciarPrimeroItLista(&itBandidos, bGlobales) == L_EXITO)
+    {
+        int jugadorPierdeV = 0;
+
+        while(esValidoItLista(&itBandidos) && !jugadorPierdeV)
+        {
+            verActualItLista(&itBandidos, &bandido, sizeof(bandido));
 
             if(jugador->posActual == bandido.posActual)
-                colisionJugadorBandido(&itBandidos, bGlobales, &bandido, jugador, mapa, protegidoEsteTurno);
+            {
+                colisionJugadorBandido(&itBandidos, bGlobales,&bandido, jugador, mapa, protegidoEsteTurno);
+                jugadorPierdeV = 1;
+            }
             else
                 avanzarItLista(&itBandidos);
-
-            //si un bandido murio y se saco de la lista
-            //ya se avanzo
         }
     }
 
@@ -534,50 +559,14 @@ int moverJugador(tJugador *jugador, tMovimiento *mov, char protegido)
 
     //MUEVO EL JUGADOR
     jugador->posActual = mov->destino;
+    jugador->puntos+= mov->pasos; //1 punto por cada casilla
 
     //recupero el terreno donde esta el jugador
     iniciarNodoItCD(&itMapa, jugador->posActual);
     verActualItCD(&itMapa, &terreno, sizeof(terreno));
 
-    //le anado el jugador y...
+    //le anado el jugador
     terreno.jugador = 1;
-
-    //...modifico el terreno de la colision...
-    switch(terreno.icon)
-    {
-        case ICON_TORMENTA:
-            if(protegido == SI)
-                {
-                    printf("\nUna tormenta te intercepto, pero al estar protegido no pierdes el turno!");
-                    Sleep(5000);
-                }
-            else
-                {
-                    printf("\nUna tormenta te intercepto, pierdes es turno!");
-                    terreno.icon = ICON_PUNTO;//el jugador hace desaparecer la tormenta
-                    jugador->turno = NO;
-                    Sleep(5000);
-                }
-        break;
-
-        case ICON_OASIS:
-            terreno.icon = ICON_PUNTO;//el jugador hace desaparecer el oasis
-            jugador->proteccion = SI;
-        break;
-
-        case ICON_PREMIO:
-            terreno.icon = ICON_PUNTO;
-            jugador->puntos++; //ajustar dependiendo de como funcione el sistema de puntos
-        break;
-
-        case ICON_VIDA:
-            terreno.icon = ICON_PUNTO;
-            jugador->vidas++;
-        break;
-
-        case ICON_SALIDA:
-            return FIN_PARTIDA;
-        }
 
     //actualizo el terreno en el mapa
     modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
@@ -657,12 +646,18 @@ int colisionJugadorBandido(tIteradorLista *itBandidos, tLista *bGlobales, tBandi
         terreno.jugador = 1;
         modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
 
-        printf("\nperdiste una vida pero te cargaste al bandido!");
+        printf("\n%cPerdiste una vida pero te cargaste al bandido!",173);
+        jugador->puntos-= jugador->vidas? 5 : 65; //si tiene vidas pierde 5 puntos (+20 por matar al bandido - 15 por perder vida),
+                                                  //si quedo sin vidas (perdio) entonces pierde 15 mas 50 de la derrota
     }
     else
-        printf("\nsobreviviste por la proteccion y te cargaste al bandido!");
+    {
+        printf("\n%cSobreviviste por la protecci%cn y te cargaste al bandido!",173,162);
+        jugador->puntos+=20;
+    }
 
-    Sleep(5000);
+
+    Sleep(T_PANTALLA);
 
     return TODO_OK;
 }
@@ -720,4 +715,104 @@ int despejarInicio(tLista *bGlobales, tListaCD *mapa, tJugador *jugador)
 
     return TODO_OK;
 }
+
+int resolverTerrenoJugador(tJugador *jugador, tListaCD *mapa, char protegido)
+{
+    //modifica en terreno con la presencia del jugador al reclamar items
+    tIteradorCD itMapa;
+    tTerreno terreno;
+
+    iniciarNodoItCD(&itMapa, jugador->posActual);
+    verActualItCD(&itMapa, &terreno, sizeof(terreno));
+
+    switch(terreno.icon)
+    {
+        case ICON_TORMENTA:
+            if(protegido == SI)
+            {
+                printf("\n%cUna tormenta te intercept%c, pero al estar protegido no pierdes el turno!",173, 162);
+                //no suma ni pierde puntos
+                Sleep(T_PANTALLA);
+            }
+            else
+            {
+                printf("\n%cUna tormenta te intercept%c, pierdes el turno!",173, 162);
+                jugador->puntos -= 15;
+                jugador->turno = NO;
+                terreno.icon = ICON_PUNTO;
+            }
+            Sleep(T_PANTALLA);
+            break;
+
+        case ICON_OASIS:
+            printf("\nEl jugador ha ca%cdo en un Oasis, en el siguiente turno tendr%c protecci%cn!", 161, 160, 162);
+            jugador->puntos += 10;
+            jugador->proteccion = SI;
+            terreno.icon = ICON_PUNTO;
+            Sleep(T_PANTALLA);
+            break;
+
+        case ICON_PREMIO:
+            printf("\n%cEnhorabuena!, el jugador ha sumado 25 puntos.", 173);
+            jugador->puntos += 25;
+            terreno.icon = ICON_PUNTO;
+            Sleep(T_PANTALLA);
+            break;
+
+        case ICON_VIDA:
+            printf("\n%cEl jugador ha conseguido una vida!", 173);
+            jugador->puntos += 15;
+            terreno.icon = ICON_PUNTO;
+            Sleep(T_PANTALLA);
+            break;
+
+        case ICON_SALIDA:
+            printf("\n%cHas ganado la partida, que aura!", 173);
+            jugador->puntos += 100;
+            Sleep(T_PANTALLA);
+            return FIN_PARTIDA;
+    }
+
+    modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
+
+    return TODO_OK;
+}
+
+char hayEvento(tJugador *jugador, tListaCD *mapa, tLista *bGlobales)
+{
+    //retorna si hubo evento con algun item en el mapa
+    tIteradorCD itMapa;
+    tTerreno terreno;
+
+    tIteradorLista itBandidos;
+    tBandido bandido;
+
+    iniciarNodoItCD(&itMapa, jugador->posActual);
+    verActualItCD(&itMapa, &terreno, sizeof(terreno));
+
+    //evento en casilla
+    if(terreno.icon == ICON_TORMENTA ||
+       terreno.icon == ICON_OASIS ||
+       terreno.icon == ICON_PREMIO ||
+       terreno.icon == ICON_VIDA ||
+       terreno.icon == ICON_SALIDA)
+        return SI;
+
+    //colisión con bandido
+    if(iniciarPrimeroItLista(&itBandidos, bGlobales) == L_EXITO)
+    {
+        while(esValidoItLista(&itBandidos))
+        {
+            verActualItLista(&itBandidos, &bandido, sizeof(bandido));
+
+            if(jugador->posActual == bandido.posActual)
+                return SI;
+
+            avanzarItLista(&itBandidos);
+        }
+    }
+
+    return NO;
+}
+
 

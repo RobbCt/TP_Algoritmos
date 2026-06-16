@@ -65,4 +65,6 @@ int esValidoItLista(const tIteradorLista *it);
 
 void reiniciarItLista(tIteradorLista *it);
 
+void* buscarPorPosicionLista(tLista* p, int posicion);
+
 #endif // FUNCIONES_LISTADINAMICA_H_INCLUDED

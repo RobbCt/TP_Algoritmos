@@ -16,6 +16,7 @@
 //tamaños def
 #define TAMLINEA        100
 #define TAM_NOMBRE       50
+#define T_PANTALLA      4000
 
 //rutas archs
 #define CONFIG_ARCH         "config.txt"
@@ -51,5 +52,8 @@
 #define AVANZAR     'A'
 #define RETROCEDER  'R'
 #define Ns_DADO      6
+
+//puntos extra
+#define PUNTOS_VICTORIA 50
 
 #endif // CONSTANTES_H_INCLUDED
