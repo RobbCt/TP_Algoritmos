@@ -12,49 +12,43 @@
 typedef struct
 {
     char icon;
-    char ultimoMov;
-    tNodo *posActual;
+    char ultimoMov;         //dir de movimiento I, D
+    tNodoCD *posActual;
 }tBandido;
 
 typedef struct
 {
-    int id;
-    //char nombre[30];
     char icon;
-    char proteccion;
-    char turno; //tiene tuno para tirar?
-    unsigned vidas; ///vidas restantes? gano; perdio;
+    char proteccion;          //tiene proteccion? SI, NO
+    char turno;               //puede jugar?      SI, NO
+    unsigned vidas;           //vidas restantes?  gano, perdio
     int puntos;
-    tNodo *posActual;
+    tNodoCD *posActual;
 }tJugador;
 
 typedef struct
 {
-    tNodo *destino;
-    unsigned pasos;
-    char direccion;
+    unsigned pasos;         //casillas a moverse
+    char direccion;         //dir del movimiento I, D
+    tNodoCD *destino;
 }tMovimiento;
-
-
 
 typedef struct
 {
     char icon;
-    unsigned turnoActualizado;
-    unsigned bandidos;
-    unsigned jugador;
+    unsigned turnoActualizado;  //en q turno un B paso por aqui?
+    unsigned bandidos;          //contador de B en casilla
+    unsigned jugador;           //esta el J aqui? 1, 0
 }tTerreno;
 
 
 
-int cargarMapa(tListaCD *mapa, tJugador *jugador, int vidasJugador, tLista *bGlobales);
+
+int cargarMapa(tListaCD *mapa, tJugador *jugador, tLista *bGlobales);
 
 void procesarTurno(tListaCD *mapa, tJugador *jugador, tLista *bGlobales, unsigned turno, tLista* listaMovimientos);
 
-void IABandidos(tMovimiento *mov, tBandido *bandido, unsigned turnoAc);
 
-int calcularTemperaturaMov(tBandido *bandido, tNodo *destino, char direccion, unsigned turnoAc);
 
-int realizarMovimientos(tJugador* j, tLista *bGlobales, tCola* colaMovimientos, tListaCD* mapa, unsigned turno);
 
 #endif // LOGICA_H_INCLUDED

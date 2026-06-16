@@ -2,68 +2,50 @@
 <CodeBlocks_layout_file>
 	<FileVersion major="1" minor="0" />
 	<ActiveTarget name="Debug" />
-	<File name="ranking.c" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="arbolBB.c" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="315" topLine="9" />
+			<Cursor1 position="70" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="GRAFICOS\logica.h" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="gestionDatos.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1315" topLine="41" />
+			<Cursor1 position="0" topLine="21" />
 		</Cursor>
 	</File>
-	<File name="juego.h" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="arbolBB.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="414" topLine="4" />
+			<Cursor1 position="0" topLine="9" />
 		</Cursor>
 	</File>
-	<File name="funciones_listaDinamica.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="juego.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="3286" topLine="141" />
+			<Cursor1 position="414" topLine="6" />
 		</Cursor>
-		<Folding>
-			<Collapse line="184" />
-		</Folding>
 	</File>
-	<File name="juego.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="GRAFICOS\render.c" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1760" topLine="47" />
+			<Cursor1 position="572" topLine="6" />
 		</Cursor>
 		<Folding>
-			<Collapse line="110" />
+			<Collapse line="165" />
 		</Folding>
 	</File>
-	<File name="config.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="tablero.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="164" topLine="0" />
+			<Cursor1 position="578" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="GRAFICOS\logica.c" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
+	<File name="juego.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="15428" topLine="321" />
+			<Cursor1 position="2833" topLine="63" />
 		</Cursor>
 		<Folding>
-			<Collapse line="245" />
-			<Collapse line="294" />
-			<Collapse line="432" />
-			<Collapse line="438" />
-			<Collapse line="450" />
-			<Collapse line="545" />
+			<Collapse line="93" />
 		</Folding>
 	</File>
-	<File name="constantes.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
+	<File name="constantes.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="6" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1416" topLine="9" />
-		</Cursor>
-	</File>
-	<File name="funciones_ListaCircDoble.c" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="6095" topLine="233" />
-		</Cursor>
-	</File>
-	<File name="main.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="558" topLine="42" />
+			<Cursor1 position="371" topLine="31" />
 		</Cursor>
 	</File>
 	<File name="GRAFICOS\render.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -71,52 +53,115 @@
 			<Cursor1 position="137" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="funciones_listaDinamica.h" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1388" topLine="8" />
-		</Cursor>
-	</File>
-	<File name="gestionDatos.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="884" topLine="36" />
-		</Cursor>
-	</File>
-	<File name="arbolBB.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1560" topLine="27" />
-		</Cursor>
-	</File>
-	<File name="tablero.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="578" topLine="0" />
-		</Cursor>
-	</File>
-	<File name="gestionDatos.c" open="1" top="1" tabpos="3" split="0" active="1" splitpos="0" zoom_1="-2" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="7156" topLine="218" />
-		</Cursor>
-	</File>
-	<File name="funciones_ListaCircDoble.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1275" topLine="17" />
-		</Cursor>
-	</File>
-	<File name="arbolBB.c" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor>
-			<Cursor1 position="1240" topLine="33" />
-		</Cursor>
-	</File>
 	<File name="tablero.c" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="9805" topLine="0" />
+			<Cursor1 position="9805" topLine="93" />
 		</Cursor>
 	</File>
-	<File name="GRAFICOS\render.c" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
+	<File name="funciones_ListaCircDoble.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="5" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="572" topLine="12" />
+			<Cursor1 position="0" topLine="35" />
 		</Cursor>
 		<Folding>
-			<Collapse line="165" />
+			<Collapse line="8" />
+			<Collapse line="14" />
+			<Collapse line="19" />
+			<Collapse line="44" />
+			<Collapse line="87" />
+			<Collapse line="131" />
+			<Collapse line="170" />
+			<Collapse line="181" />
+			<Collapse line="216" />
+			<Collapse line="227" />
+			<Collapse line="246" />
+			<Collapse line="255" />
+			<Collapse line="264" />
+			<Collapse line="289" />
+			<Collapse line="300" />
+			<Collapse line="311" />
+			<Collapse line="321" />
+			<Collapse line="329" />
+			<Collapse line="340" />
+			<Collapse line="351" />
+			<Collapse line="363" />
+		</Folding>
+	</File>
+	<File name="funciones_ListaCircDoble.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="6" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1530" topLine="55" />
+		</Cursor>
+	</File>
+	<File name="funciones_listaDinamica.c" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="3" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="3577" topLine="22" />
+		</Cursor>
+		<Folding>
+			<Collapse line="4" />
+			<Collapse line="11" />
+			<Collapse line="17" />
+			<Collapse line="22" />
+			<Collapse line="34" />
+			<Collapse line="54" />
+			<Collapse line="70" />
+			<Collapse line="80" />
+			<Collapse line="107" />
+			<Collapse line="125" />
+			<Collapse line="138" />
+			<Collapse line="149" />
+			<Collapse line="161" />
+			<Collapse line="172" />
+			<Collapse line="182" />
+			<Collapse line="193" />
+			<Collapse line="203" />
+			<Collapse line="232" />
+			<Collapse line="237" />
+		</Folding>
+	</File>
+	<File name="main.c" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="7" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="224" topLine="6" />
+		</Cursor>
+	</File>
+	<File name="GRAFICOS\logica.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="2" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="0" topLine="24" />
+		</Cursor>
+	</File>
+	<File name="funciones_listaDinamica.h" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="4" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="1560" topLine="21" />
+		</Cursor>
+	</File>
+	<File name="config.c" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="164" topLine="0" />
+		</Cursor>
+	</File>
+	<File name="GRAFICOS\logica.c" open="1" top="1" tabpos="2" split="0" active="1" splitpos="0" zoom_1="6" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="356" topLine="0" />
+		</Cursor>
+		<Folding>
+			<Collapse line="47" />
+			<Collapse line="67" />
+			<Collapse line="85" />
+			<Collapse line="117" />
+			<Collapse line="153" />
+			<Collapse line="181" />
+			<Collapse line="204" />
+			<Collapse line="247" />
+			<Collapse line="265" />
+			<Collapse line="276" />
+			<Collapse line="298" />
+			<Collapse line="316" />
+			<Collapse line="322" />
+			<Collapse line="333" />
+			<Collapse line="366" />
+			<Collapse line="371" />
+			<Collapse line="461" />
+			<Collapse line="508" />
+			<Collapse line="582" />
+			<Collapse line="616" />
 		</Folding>
 	</File>
 </CodeBlocks_layout_file>

@@ -11,6 +11,7 @@
 #define SIN_JUGADOR       6
 #define JUGADOR_EXISTENTE 7
 #define DUPLICADO         8
+#define FIN_PARTIDA       9
 
 //tamaños def
 #define TAMLINEA        100
@@ -49,6 +50,7 @@
 #define NO          'N'
 #define AVANZAR     'A'
 #define RETROCEDER  'R'
+#define Ns_DADO      6
 
 //puntos extra
 #define PUNTOS_VICTORIA 50

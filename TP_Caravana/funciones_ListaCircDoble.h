@@ -4,23 +4,29 @@
 #include <stdlib.h> //malloc
 #include <string.h> //memcpy
 
-#define EXITO 0
-#define SIN_MEM 1
-#define LISTA_VACIA 2
-#define LISTA_DISPONIBLE 3
-#define CLA_INEX 4
+#define LCD_EXITO 0
+#define LCD_SIN_MEM 1
+#define LCD_VACIA 2
+#define LCD_DISPONIBLE 3
+#define LCD_CLA_INEX 4
 
 #define MIN(X, Y) ((X) <= (Y) ? (X) : (Y))
 
-typedef struct sNodo
+typedef struct sNodoCD
 {
     void *info;
     unsigned tamInfo;
-    struct sNodo *sig,
+    struct sNodoCD *sig,
                  *ant;
-}tNodo;
+}tNodoCD;
 
-typedef tNodo* tListaCD;
+typedef tNodoCD* tListaCD;
+
+typedef struct
+{
+    tNodoCD *actual;
+    int posicion;
+} tIteradorCD; //onda topicos
 
 typedef int (*tCmp)(const void*, const void*);
 
@@ -48,12 +54,43 @@ int sacarUltimoListaCD(tListaCD *p, void *d, unsigned tamBytes);
 
 int verUltimoListaCD(const tListaCD *p, void *d, unsigned tamBytes);
 
-int insertarOrdenadoXclaveCD(tListaCD *p, const void *d, unsigned tamBytes, tCmp cmp);
-
 void mostrarListaCD(const tListaCD *p, tMostrar mostrar);
 
-void ordenarListaXclaveCD(tListaCD *p, tCmp cmp);
+tNodoCD* obtenerPrimerNodoListaCD(const tListaCD *lista);
 
-int eliminarXclaveCD(tListaCD *p, void *d, unsigned tamBytes, tCmp cmp);
+tNodoCD* obtenerUltimoNodoListaCD(const tListaCD *lista);
+
+int posEnListaCD(const tListaCD *lista, const tNodoCD *nodoBuscado);
+
+
+///ITERADOR
+
+int iniciarPrimeroItCD(tIteradorCD *it, const tListaCD *p);
+
+int iniciarNodoItCD(tIteradorCD *it, tNodoCD *nodo);
+
+int verActualItCD(tIteradorCD *it, void *d, unsigned tamBytes);
+
+tNodoCD* verNodoActualItCD(const tIteradorCD *it);
+
+int avanzarItCD(tIteradorCD *it);
+
+int retrocederItCD(tIteradorCD *it);
+
+int modificarActualItCD(tIteradorCD *it, const void *d, unsigned tamBytes);
+
+void reiniciarItCD(tIteradorCD *it);
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif // FUNCIONES_LISTACIRCDOBLE_H_INCLUDED
