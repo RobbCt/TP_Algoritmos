@@ -656,7 +656,6 @@ int colisionJugadorBandido(tIteradorLista *itBandidos, tLista *bGlobales, tBandi
         jugador->puntos+=20;
     }
 
-
     Sleep(T_PANTALLA);
 
     return TODO_OK;
@@ -762,6 +761,7 @@ int resolverTerrenoJugador(tJugador *jugador, tListaCD *mapa, char protegido)
         case ICON_VIDA:
             printf("\n%cEl jugador ha conseguido una vida!", 173);
             jugador->puntos += 15;
+            jugador->vidas ++;
             terreno.icon = ICON_PUNTO;
             Sleep(T_PANTALLA);
             break;

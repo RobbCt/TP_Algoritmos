@@ -100,7 +100,7 @@
 	<stdlib.h>
 	<string.h>
 
-1781581202 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\render.c
+1781583768 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\render.c
 	"render.h"
 	"logica.h"
 
@@ -110,7 +110,7 @@
 	"../funciones_ListaCircDoble.h"
 	"../constantes.h"
 
-1781581051 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.c
+1781584022 source:c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.c
 	"logica.h"
 
 1781578589 c:\users\rober\desktop\tp-algo\tp_caravana\graficos\logica.h
@@ -323,7 +323,7 @@
 	<math.h>
 	"config.h"
 
-1781578766 source:c:\users\rober\desktop\tp-algo\tp_caravana\gestiondatos.c
+1781583768 source:c:\users\rober\desktop\tp-algo\tp_caravana\gestiondatos.c
 	"gestionDatos.h"
 
 1781572877 c:\users\rober\desktop\tp-algo\tp_caravana\gestiondatos.h
@@ -351,8 +351,14 @@
 
 1781566357 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\arbolbb.c
 	"arbolBB.h"
+	"arbolBB.h"
 
 1781566296 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\arbolbb.h
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<math.h>
+	"config.h"
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -361,12 +367,16 @@
 
 1781292404 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\funciones_coladinamica.c
 	"funciones_colaDinamica.h"
+	"funciones_colaDinamica.h"
 
 1781292404 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\funciones_coladinamica.h
 	<stdlib.h>
 	<string.h>
+	<stdlib.h>
+	<string.h>
 
 1781566764 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\gestiondatos.c
+	"gestionDatos.h"
 	"gestionDatos.h"
 
 1781566764 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\gestiondatos.h
@@ -377,11 +387,20 @@
 	"arbolBB.h"
 	"constantes.h"
 	"funciones_listaDinamica.h"
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	"arbolBB.h"
+	"constantes.h"
+	"funciones_listaDinamica.h"
 
 1781292404 c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\tdavector.h
 	"config.h"
+	"config.h"
 
 1781292404 source:c:\jazmin\facultad_2026\algoritmosyestructurasdedatos_3640\tp_caravana\tp_algoritmos\tp_caravana\tdavector.c
+	"TDAvector.h"
 	"TDAvector.h"
 
 1781572877 source:c:\users\rober\downloads\tp_algoritmos repo\tp_caravana\arbolbb.c

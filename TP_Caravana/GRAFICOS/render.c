@@ -52,7 +52,6 @@ void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, cha
         //borde superior
         imprimirBorde(contexto.numCol);
 
-
         for(j = 0; j < ALTO_CASILLA; j++)
         {
             int largo, izq, der;
