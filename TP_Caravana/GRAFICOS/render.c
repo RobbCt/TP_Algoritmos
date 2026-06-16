@@ -11,7 +11,9 @@
 
 void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, char turno, unsigned nTurno)
 {
-    tNodoCD *act, *inicio;
+    tIteradorCD it;
+    tNodoCD* primero;
+    tTerreno terreno;
 
     char fila[COLUMNAS_MAPA][ALTO_CASILLA][MAX_TEXTO_CASILLA];
 
@@ -20,33 +22,34 @@ void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, cha
 
     system("cls");
 
-    act = inicio = *m;
+    iniciarPrimeroItCD(&it, m);
+    primero = verNodoActualItCD(&it);
 
     printf("VIDAS: %d | PROT: %c | PUNTOS: %d | TURNO: %c | NUMERO DE TURNO: %u\n\n",
            vidas, proteccion, puntos, turno, nTurno);
 
     do
     {
-        tTerreno *terreno = (tTerreno*)act->info;
+        verActualItCD(&it, &terreno, sizeof(terreno));
         char items[ALTO_CASILLA][MAX_TEXTO_CASILLA];
         int cantItems = 0;
         int i;
 
-        if(terreno->icon != ICON_PUNTO)
-            sprintf(items[cantItems++], "%c", terreno->icon);
+        if(terreno.icon != ICON_PUNTO)
+            sprintf(items[cantItems++], "%c", terreno.icon);
 
         /* Jugador */
-        if(terreno->jugador)
+        if(terreno.jugador)
             sprintf(items[cantItems++], "%c", ICON_JUGADOR);
 
         /* Bandidos */
-        if(terreno->bandidos)
+        if(terreno.bandidos)
         {
-            if(terreno->bandidos == 1)
+            if(terreno.bandidos == 1)
                 sprintf(items[cantItems++], "%c", ICON_BANDIDO);
             else
                 sprintf(items[cantItems++], "%ux%c",
-                        terreno->bandidos,
+                        terreno.bandidos,
                         ICON_BANDIDO);
         }
 
@@ -114,9 +117,9 @@ void renderizarPantalla(tListaCD *m, int vidas, char proteccion, int puntos, cha
             numFila++;
         }
 
-        act = act->sig;
+        avanzarItCD(&it);
 
-    } while(act != inicio);
+    } while(verNodoActualItCD(&it) != primero);
 
     if(numCol > 0)
     {

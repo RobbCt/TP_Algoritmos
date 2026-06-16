@@ -22,7 +22,7 @@ typedef struct
     char proteccion;          //tiene proteccion? SI, NO
     char turno;               //puede jugar?      SI, NO
     unsigned vidas;           //vidas restantes?  gano, perdio
-    unsigned puntos;
+    int puntos;
     tNodoCD *posActual;
 }tJugador;
 

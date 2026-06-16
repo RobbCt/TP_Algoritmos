@@ -534,6 +534,7 @@ int moverJugador(tJugador *jugador, tMovimiento *mov, char protegido)
 
     //MUEVO EL JUGADOR
     jugador->posActual = mov->destino;
+    jugador->puntos+= mov->pasos; //1 punto por cada casilla
 
     //recupero el terreno donde esta el jugador
     iniciarNodoItCD(&itMapa, jugador->posActual);
@@ -548,12 +549,14 @@ int moverJugador(tJugador *jugador, tMovimiento *mov, char protegido)
         case ICON_TORMENTA:
             if(protegido == SI)
                 {
-                    printf("\nUna tormenta te intercepto, pero al estar protegido no pierdes el turno!");
+                    printf("\n%cUna tormenta te intercept%c, pero al estar protegido no pierdes el turno!",173, 162);
+                    //no suma ni pierde puntos
                     Sleep(5000);
                 }
             else
                 {
-                    printf("\nUna tormenta te intercepto, pierdes es turno!");
+                    printf("\n%cUna tormenta te intercept%c, pierdes el turno!",173, 162);
+                    jugador->puntos-=15;
                     terreno.icon = ICON_PUNTO;//el jugador hace desaparecer la tormenta
                     jugador->turno = NO;
                     Sleep(5000);
@@ -562,20 +565,30 @@ int moverJugador(tJugador *jugador, tMovimiento *mov, char protegido)
 
         case ICON_OASIS:
             terreno.icon = ICON_PUNTO;//el jugador hace desaparecer el oasis
+            printf("\nEl jugador ha ca%cdo en un Oasis, en el siguiente turno tendr%c protecci%cn!", 161, 160, 162);
+            jugador->puntos+=10;
             jugador->proteccion = SI;
+            Sleep(5000);
         break;
 
         case ICON_PREMIO:
             terreno.icon = ICON_PUNTO;
-            jugador->puntos++; //ajustar dependiendo de como funcione el sistema de puntos
+            printf("\n%cEnhorabuena!, el jugador ha sumado 25 puntos.", 173);
+            jugador->puntos+=25;
+            Sleep(5000);
         break;
 
         case ICON_VIDA:
             terreno.icon = ICON_PUNTO;
+            printf("\n%cEl jugador ha conseguido una vida!", 173);
+            jugador->puntos+=15;
             jugador->vidas++;
+            Sleep(5000);
         break;
 
         case ICON_SALIDA:
+            printf("\n%cHas ganado la partida!", 173);
+            jugador->puntos+=100;
             return FIN_PARTIDA;
         }
 
@@ -657,10 +670,16 @@ int colisionJugadorBandido(tIteradorLista *itBandidos, tLista *bGlobales, tBandi
         terreno.jugador = 1;
         modificarActualItCD(&itMapa, &terreno, sizeof(terreno));
 
-        printf("\nperdiste una vida pero te cargaste al bandido!");
+        printf("\n%cPerdiste una vida pero te cargaste al bandido!",173);
+        jugador->puntos-= jugador->vidas? 5 : 65; //si tiene vidas pierde 5 puntos (+20 por matar al bandido - 15 por perder vida),
+                                                  //si quedo sin vidas (perdio) entonces pierde 15 mas 50 de la derrota
     }
     else
-        printf("\nsobreviviste por la proteccion y te cargaste al bandido!");
+    {
+        printf("\n%cSobreviviste por la protecci%cn y te cargaste al bandido!",173,162);
+        jugador->puntos+=20;
+    }
+
 
     Sleep(5000);
 
